@@ -175,7 +175,7 @@ class MusicFloatingPlayerBarContent extends ConsumerWidget {
                                 onPressed: () => ref.read(videoPlayerProvider).skipToPrevious(),
                                 icon: const Icon(IconsaxPlusBold.previous),
                               ),
-                              IconButton.filledTonal(
+                              IconButton(
                                 onPressed: () => ref.read(videoPlayerProvider).playOrPause(),
                                 iconSize: 32,
                                 icon: playbackState.playing
@@ -207,7 +207,7 @@ class MusicFloatingPlayerBarContent extends ConsumerWidget {
                               ? const Icon(IconsaxPlusBold.heart)
                               : const Icon(IconsaxPlusLinear.heart),
                         ),
-                        IconButton.filledTonal(
+                        IconButton(
                           onPressed: () => ref.read(videoPlayerProvider).playOrPause(),
                           iconSize: 32,
                           icon: playbackState.playing

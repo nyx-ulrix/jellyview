@@ -378,7 +378,7 @@ class _SeerSearchScreenAppBar extends StatelessWidget {
                     child: state != ScrollState.top
                         ? Tooltip(
                             message: context.localized.scrollToTop,
-                            child: IconButton.filled(
+                            child: IconButton(
                               onPressed: () => scrollController.animateTo(0,
                                   duration: const Duration(milliseconds: 500), curve: Curves.easeInOutCubic),
                               icon: const Icon(

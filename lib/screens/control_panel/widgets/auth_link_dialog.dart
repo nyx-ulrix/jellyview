@@ -203,7 +203,7 @@ class _AuthLinkDialogState extends State<AuthLinkDialog> {
                           mainAxisSize: MainAxisSize.min,
                           spacing: 8,
                           children: [
-                            const Icon(IconsaxPlusLinear.command_square),
+                            const Icon(IconsaxPlusLinear.command),
                             Text(context.localized.shareQRCode),
                           ],
                         ),

@@ -205,7 +205,7 @@ class PosterImage extends ConsumerWidget {
             if (poster.playAble)
               Align(
                 alignment: Alignment.center,
-                child: IconButton.filledTonal(
+                child: IconButton(
                   onPressed: () => playVideo?.call(false),
                   icon: const Icon(
                     IconsaxPlusBold.play,

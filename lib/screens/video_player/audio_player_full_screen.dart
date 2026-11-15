@@ -1033,7 +1033,7 @@ class _AudioPlayerControlsState extends ConsumerState<_AudioPlayerControls> {
                     onPressed: () => ref.read(videoPlayerProvider).skipToPrevious(),
                     icon: const Icon(IconsaxPlusBold.previous),
                   ),
-                  IconButton.filledTonal(
+                  IconButton(
                     onPressed: () => ref.read(videoPlayerProvider).playOrPause(),
                     iconSize: 42,
                     icon: playback.playing ? const Icon(IconsaxPlusBold.pause) : const Icon(IconsaxPlusBold.play),

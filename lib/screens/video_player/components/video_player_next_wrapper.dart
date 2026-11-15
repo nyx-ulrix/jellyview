@@ -270,16 +270,16 @@ class _VideoPlayerNextWrapperState extends ConsumerState<VideoPlayerNextWrapper>
                                       ),
                                     ),
                                     const SizedBox(width: 8),
-                                    IconButton.filledTonal(
+                                    IconButton(
                                       onPressed: () => hideNextUp(),
                                       tooltip: context.localized.resumeVideo,
                                       icon: const Icon(IconsaxPlusBold.maximize_4),
                                     ),
                                     const SizedBox(width: 8),
-                                    IconButton.filledTonal(
+                                    IconButton(
                                       onPressed: () => closePlayer(),
                                       tooltip: context.localized.closeVideo,
-                                      icon: const Icon(IconsaxPlusBold.close_square),
+                                      icon: const Icon(Icons.close_rounded),
                                     ),
                                   ],
                                 ),
@@ -441,12 +441,12 @@ class _SimpleControls extends ConsumerWidget {
     return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton.filledTonal(
+          IconButton(
             onPressed: () => player.playOrPause(),
             icon: Icon(isPlaying ? IconsaxPlusBold.pause : IconsaxPlusBold.play),
           ),
           if (skip != null)
-            IconButton.filledTonal(
+            IconButton(
               onPressed: skip,
               tooltip: context.localized.playNextVideo,
               icon: const Icon(IconsaxPlusBold.next),

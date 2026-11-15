@@ -40,7 +40,7 @@ class LoginEditUser extends ConsumerWidget {
                 Text(user.credentials.url),
                 if (onTapServer != null) ...{
                   const SizedBox(width: 8),
-                  IconButton.filledTonal(
+                  IconButton(
                     onPressed: () {
                       onTapServer?.call(user.credentials.url);
                     },

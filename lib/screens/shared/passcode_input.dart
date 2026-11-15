@@ -108,7 +108,7 @@ class _PassCodeInputState extends ConsumerState<PassCodeInput> {
   }
 
   Widget passCodeNumber(int value) {
-    return IconButton.filled(
+    return IconButton(
       autofocus: AdaptiveLayout.inputDeviceOf(context) == InputDevice.dPad ? value == 1 : false,
       onPressed: () {
         addToPassCode(value.toString());
@@ -151,7 +151,7 @@ class _PassCodeInputState extends ConsumerState<PassCodeInput> {
   }
 
   Widget get clearAllButton {
-    return IconButton.filled(
+    return IconButton(
       style: ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.errorContainer),
         iconColor: WidgetStatePropertyAll(Theme.of(context).colorScheme.onErrorContainer),
@@ -169,7 +169,7 @@ class _PassCodeInputState extends ConsumerState<PassCodeInput> {
   }
 
   Widget get backSpaceButton {
-    return IconButton.filled(
+    return IconButton(
       onPressed: () => backSpace(),
       icon: Icon(
         Icons.backspace_rounded,

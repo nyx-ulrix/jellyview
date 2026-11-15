@@ -80,7 +80,7 @@ class CategoryChip<T> extends StatelessWidget {
                 newEntry = null;
                 onClear!();
               },
-              icon: const Icon(IconsaxPlusLinear.back_square),
+              icon: const Icon(Icons.arrow_back_rounded),
               label: Text(context.localized.clear),
             )
         ].addInBetween(const SizedBox(width: 6));
@@ -109,7 +109,7 @@ class CategoryChip<T> extends StatelessWidget {
                       newEntry = null;
                       onClear!();
                     },
-                    icon: const Icon(IconsaxPlusLinear.back_square),
+                    icon: const Icon(Icons.arrow_back_rounded),
                     label: Text(context.localized.clear),
                   )
               ].addInBetween(const SizedBox(width: 6)),

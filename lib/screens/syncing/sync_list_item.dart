@@ -152,7 +152,7 @@ class SyncListItem extends ConsumerWidget {
                     ),
                     IconButton(
                       onPressed: () => showSyncItemDetails(context, syncedItem, ref),
-                      icon: const Icon(IconsaxPlusLinear.more_square),
+                      icon: const Icon(Icons.more_horiz),
                     ),
                   ],
                 ),

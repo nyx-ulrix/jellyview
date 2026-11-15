@@ -126,7 +126,7 @@ class _SyncedScreenState extends ConsumerState<SyncedScreen> {
                             IconButton(
                               tooltip: 'Select all',
                               onPressed: () => setState(() => picked.addAll(items.map((e) => e.id))),
-                              icon: const Icon(IconsaxPlusLinear.tick_square),
+                              icon: const Icon(IconsaxPlusLinear.tick_circle),
                             ),
                             IconButton(
                               tooltip: context.localized.delete,

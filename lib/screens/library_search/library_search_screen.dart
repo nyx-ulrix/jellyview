@@ -352,12 +352,12 @@ class _LibrarySearchScreenState extends ConsumerState<LibrarySearchScreen> {
           ItemActionButton(
             action: () => libraryProvider.selectAll(true),
             label: Text(context.localized.selectAll),
-            icon: const Icon(IconsaxPlusLinear.tick_square),
+            icon: const Icon(IconsaxPlusLinear.tick_circle),
           ),
           ItemActionButton(
             action: () => libraryProvider.selectAll(false),
             label: Text(context.localized.clearSelection),
-            icon: const Icon(IconsaxPlusLinear.minus_square),
+            icon: const Icon(IconsaxPlusLinear.minus_cirlce),
           ),
           ItemActionDivider(),
           ItemActionButton(
@@ -844,7 +844,7 @@ class LibraryAppBar extends ConsumerWidget {
                     child: state != ScrollState.top
                         ? Tooltip(
                             message: context.localized.scrollToTop,
-                            child: IconButton.filled(
+                            child: IconButton(
                               onPressed: () => scrollController.animateTo(0,
                                   duration: const Duration(milliseconds: 500), curve: Curves.easeInOutCubic),
                               icon: const Icon(

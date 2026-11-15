@@ -211,7 +211,7 @@ class _TvPlayerControlsState extends ConsumerState<TvPlayerControls> {
                         child: Tooltip(
                             message: context.localized.stop,
                             child: IconButton(
-                                onPressed: () => closePlayer(), icon: const Icon(IconsaxPlusLinear.close_square))),
+                                onPressed: () => closePlayer(), icon: const Icon(Icons.close_rounded))),
                       ),
                   ],
                 ),
@@ -274,7 +274,7 @@ class _TvPlayerControlsState extends ConsumerState<TvPlayerControls> {
                     previousButton,
                     seekBackwardButton(ref),
                   ],
-                  IconButton.filledTonal(
+                  IconButton(
                     iconSize: 38,
                     onPressed: () {
                       ref.read(videoPlayerProvider).playOrPause();
@@ -298,7 +298,7 @@ class _TvPlayerControlsState extends ConsumerState<TvPlayerControls> {
                             message: context.localized.stop,
                             child: IconButton(
                               onPressed: () => closePlayer(),
-                              icon: const Icon(IconsaxPlusLinear.close_square),
+                              icon: const Icon(Icons.close_rounded),
                             ),
                           ),
                         const Spacer(),

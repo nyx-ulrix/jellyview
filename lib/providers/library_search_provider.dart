@@ -7,7 +7,6 @@ import 'package:auto_route/auto_route.dart';
 import 'package:chopper/chopper.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart';
 import 'package:fladder/models/collection_types.dart';
@@ -947,7 +946,7 @@ class LibrarySearchNotifier extends StateNotifier<LibrarySearchModel> {
                       cancelAble.cancel();
                       context.pop();
                     },
-                    icon: const Icon(IconsaxPlusLinear.close_square),
+                    icon: const Icon(Icons.close_rounded),
                   )
                 ],
               ),

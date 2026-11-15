@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/jellyfin/jellyfin_open_api.enums.swagger.dart' as jelly;
 import 'package:fladder/models/item_base_model.dart';
@@ -194,7 +193,7 @@ class PosterPlaceHolder extends StatelessWidget {
                   spacing: 8,
                   children: [
                     const Icon(
-                      IconsaxPlusLinear.more_square,
+                      Icons.more_horiz,
                       size: 46,
                     ),
                     Text(

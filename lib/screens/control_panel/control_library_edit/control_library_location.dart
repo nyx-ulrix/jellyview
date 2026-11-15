@@ -69,7 +69,7 @@ class ControlLibraryLocationEditor extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ),
-                  IconButton.filled(
+                  IconButton(
                     icon: const Icon(IconsaxPlusLinear.trash),
                     style: IconButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.errorContainer,

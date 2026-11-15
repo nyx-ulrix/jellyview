@@ -84,7 +84,7 @@ class _VideoSubtitleControlsState extends ConsumerState<VideoSubtitleControls> {
                   )
                 ],
               ).addVisiblity(activeKey == null ? controlsHidden : activeKey == const Key('title')),
-            IconButton.filledTonal(
+            IconButton(
               isSelected: !hideControls,
               onPressed: () => setState(() => hideControls = !hideControls),
               icon: Icon(hideControls ? Icons.visibility_rounded : Icons.visibility_off_rounded),

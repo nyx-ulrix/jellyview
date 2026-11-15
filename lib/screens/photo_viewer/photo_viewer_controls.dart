@@ -232,7 +232,7 @@ class _PhotoViewerControllsState extends ConsumerState<PhotoViewerControls> with
                             children: [
                               ElevatedIconButton(
                                 onPressed: widget.openOptions,
-                                icon: IconsaxPlusLinear.more_square,
+                                icon: Icons.more_horiz,
                               ),
                               const Spacer(),
                               SelectableIconButton(

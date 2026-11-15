@@ -21,7 +21,7 @@ class AdaptiveFab {
   Widget get normal {
     return Hero(
       tag: heroTag ?? UniqueKey(),
-      child: IconButton.filledTonal(
+      child: IconButton(
         iconSize: 26,
         key: key,
         tooltip: title,

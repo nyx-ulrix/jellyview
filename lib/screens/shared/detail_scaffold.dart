@@ -164,7 +164,6 @@ class _DetailScaffoldState extends ConsumerState<DetailScaffold> {
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final horizontalBasePadding = size.width / 25;
     final safeArea = MediaQuery.paddingOf(context);
-    final backGroundColor = Theme.of(context).colorScheme.surface.withValues(alpha: 0.8);
     final minHeight = 450.0.clamp(0, size.height).toDouble();
     final maxHeight = size.height - 10;
     // The artwork fills a tall area on an upright phone: use the portrait poster there instead of
@@ -360,10 +359,7 @@ class _DetailScaffoldState extends ConsumerState<DetailScaffold> {
                     padding: topRowPadding,
                     child: Row(
                       children: [
-                        IconButton.filledTonal(
-                          style: IconButton.styleFrom(
-                            backgroundColor: backGroundColor,
-                          ),
+                        IconButton(
                           onPressed: () => context.router.popBack(),
                           icon: Padding(
                             padding:
@@ -375,8 +371,6 @@ class _DetailScaffoldState extends ConsumerState<DetailScaffold> {
                         AnimatedSize(
                           duration: const Duration(milliseconds: 250),
                           child: Container(
-                            decoration: BoxDecoration(
-                                color: backGroundColor, borderRadius: BorderRadius.circular(999)), // pill
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [

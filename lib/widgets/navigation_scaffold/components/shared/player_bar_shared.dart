@@ -143,7 +143,7 @@ class FloatingPlayerBarActionsRow extends StatelessWidget {
         Flexible(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: IconButton.filledTonal(
+            child: IconButton(
               onPressed: onPlayPause,
               icon: playbackInfo.playing ? const Icon(Icons.pause_rounded) : const Icon(Icons.play_arrow_rounded),
             ),

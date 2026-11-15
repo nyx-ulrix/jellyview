@@ -162,8 +162,9 @@ class _ChapterProgressSliderState extends ConsumerState<VideoProgressBar> {
                             .clamp(1, constraints.maxWidth),
                         height: sliderHeight,
                         child: GappedContainerShape(
-                          activeColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                          inActiveColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                          // Buffered part: quiet grey, so the only red is how far you've watched.
+                          activeColor: Colors.white.withValues(alpha: 0.3),
+                          inActiveColor: Colors.white.withValues(alpha: 0.3),
                           thumbPosition: bufferFraction,
                         ),
                       ),

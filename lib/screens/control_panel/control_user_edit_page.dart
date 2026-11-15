@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/providers/control_panel/control_users_provider.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
@@ -97,7 +96,7 @@ class _ControlUserEditPageState extends ConsumerState<ControlUserEditPage> {
                     ),
                     IconButton(
                       onPressed: () => context.tabsRouter.navigate(const ControlUsersRoute()),
-                      icon: const Icon(IconsaxPlusBold.close_square),
+                      icon: const Icon(Icons.close_rounded),
                     )
                   ],
                 ),

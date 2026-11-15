@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/screens/shared/fladder_notification_overlay.dart';
 import 'package:fladder/screens/shared/outlined_text_field.dart';
@@ -26,7 +25,7 @@ Future<void> showConnectLinkDialog(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                icon: const Icon(IconsaxPlusBold.close_square),
+                icon: const Icon(Icons.close_rounded),
               )
             ],
           ),

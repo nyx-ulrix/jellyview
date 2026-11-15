@@ -265,7 +265,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> with Widg
                     alignment: Alignment.centerRight,
                     width: 50,
                     height: MediaQuery.sizeOf(context).height * 0.5,
-                    child: IconButton.filledTonal(
+                    child: IconButton(
                       style:
                           IconButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                       onPressed: viewer.next,
@@ -288,7 +288,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen> with Widg
                     alignment: Alignment.centerLeft,
                     width: 50,
                     height: MediaQuery.sizeOf(context).height * 0.5,
-                    child: IconButton.filledTonal(
+                    child: IconButton(
                       style:
                           IconButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
                       onPressed: viewer.previous,

@@ -207,7 +207,7 @@ class _GetScreenState extends ConsumerState<GetScreen> {
         // The dashboard's other pages (upgrade quality, missing subtitles, delete...) open over the app.
         PopupMenuButton<String>(
           tooltip: 'More',
-          icon: const Icon(IconsaxPlusLinear.more_square),
+          icon: const Icon(Icons.more_horiz),
           onSelected: (page) => openDashboardPage(page),
           itemBuilder: (context) => const [
             PopupMenuItem(value: 'library', child: Text('Manage library (upgrade, subtitles, delete)')),
@@ -394,7 +394,7 @@ class _Poster extends StatelessWidget {
         child: url == null
             ? ColoredBox(
                 color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                child: const Icon(IconsaxPlusLinear.video_square),
+                child: const Icon(IconsaxPlusLinear.video_circle),
               )
             // Placeholder tile behind the art so a slow/blocked image host never leaves a hole in the row.
             : ColoredBox(
@@ -405,7 +405,7 @@ class _Poster extends StatelessWidget {
                   width: width,
                   height: width * 1.5,
                   cacheWidth: (width * 3).round(),
-                  errorBuilder: (context, _, __) => const Icon(IconsaxPlusLinear.video_square),
+                  errorBuilder: (context, _, __) => const Icon(IconsaxPlusLinear.video_circle),
                 ),
               ),
       ),

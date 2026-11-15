@@ -70,7 +70,7 @@ class ControlActiveTasksPage extends ConsumerWidget {
                             spacing: 12,
                             children: [
                               if (!dPadMode)
-                                IconButton.filledTonal(
+                                IconButton(
                                   onPressed: () {
                                     showDialogAdaptive(
                                       context: context,
@@ -451,7 +451,7 @@ class _TaskTriggerItem extends StatelessWidget {
                 ),
             ],
           ),
-          IconButton.filled(
+          IconButton(
             onPressed: onDelete,
             style: IconButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.errorContainer,

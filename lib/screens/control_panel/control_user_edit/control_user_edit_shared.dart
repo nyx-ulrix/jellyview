@@ -50,7 +50,7 @@ class AccessSchedulesEditor extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              IconButton.filledTonal(
+              IconButton(
                 icon: const Icon(IconsaxPlusBold.add_circle),
                 onPressed: () {
                   DynamicDayOfWeek selectedDay = DynamicDayOfWeek.values.first;
@@ -245,7 +245,7 @@ class TagsEditor extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              IconButton.filledTonal(
+              IconButton(
                 onPressed: () {
                   showDialog(
                     context: context,

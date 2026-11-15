@@ -8,7 +8,6 @@ import 'package:async/async.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:square_progress_indicator/square_progress_indicator.dart';
 
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart';
@@ -907,7 +906,7 @@ class _LoadIndicatorCancelable extends StatelessWidget {
                   } catch (_) {}
                   Navigator.of(context, rootNavigator: true).pop();
                 },
-                icon: const Icon(IconsaxPlusLinear.close_square),
+                icon: const Icon(Icons.close_rounded),
               ),
           ],
         ),

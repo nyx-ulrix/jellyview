@@ -101,7 +101,7 @@ class ItemActionButton extends ItemAction {
 
   @override
   Widget toButton() => backgroundColor != null
-      ? IconButton.filled(
+      ? IconButton(
           onPressed: action,
           style: ButtonStyle(
             backgroundColor: WidgetStatePropertyAll(backgroundColor),
@@ -139,7 +139,7 @@ class ItemActionButton extends ItemAction {
               : Row(
                   children: [
                     if (label != null) Expanded(child: label!),
-                    if (selected) Icon(IconsaxPlusBold.tick_square, size: 24, color: resolvedForegroundColor),
+                    if (selected) Icon(IconsaxPlusBold.tick_circle, size: 24, color: resolvedForegroundColor),
                   ],
                 );
 

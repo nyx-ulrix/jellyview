@@ -181,10 +181,10 @@ class HomeScreen extends ConsumerWidget {
               return DestinationModel(
                 label: context.localized.navigationDashboard,
                 icon: Icon(
-                  isMusicDashboardMode ? IconsaxPlusLinear.music_square : IconsaxPlusLinear.home_1,
+                  isMusicDashboardMode ? IconsaxPlusLinear.music_circle : IconsaxPlusLinear.home_1,
                 ),
                 selectedIcon: Icon(
-                  isMusicDashboardMode ? IconsaxPlusBold.music_square : IconsaxPlusBold.home_1,
+                  isMusicDashboardMode ? IconsaxPlusBold.music_circle : IconsaxPlusBold.home_1,
                 ),
                 route: const DashboardRoute(),
                 action: () => e.navigate(context),

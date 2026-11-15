@@ -89,7 +89,7 @@ class VideoFloatingPlayerBarContent extends ConsumerWidget {
                       Flexible(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: IconButton.filledTonal(
+                          child: IconButton(
                             onPressed: () => ref.read(videoPlayerProvider).playOrPause(),
                             icon: playbackState.playing
                                 ? const Icon(Icons.pause_rounded)

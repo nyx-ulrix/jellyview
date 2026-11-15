@@ -127,7 +127,7 @@ class _LoginScreenCredentialsState extends ConsumerState<LoginScreenCredentials>
             children: [
               AspectRatio(
                 aspectRatio: 1,
-                child: IconButton.filledTonal(
+                child: IconButton(
                   onPressed: () => provider.goUserSelect(),
                   icon: const Icon(
                     IconsaxPlusLinear.arrow_left_2,
@@ -152,7 +152,7 @@ class _LoginScreenCredentialsState extends ConsumerState<LoginScreenCredentials>
                 child: Tooltip(
                   message: context.localized.retrievePublicListOfUsers,
                   waitDuration: const Duration(seconds: 1),
-                  child: IconButton.filled(
+                  child: IconButton(
                     onPressed: () => provider.setServer(serverTextController.text),
                     icon: const Icon(
                       IconsaxPlusLinear.refresh,
@@ -183,7 +183,7 @@ class _LoginScreenCredentialsState extends ConsumerState<LoginScreenCredentials>
                   children: [
                     Text(context.localized.connectWithAuthLink),
                     const SizedBox(width: 8),
-                    const Icon(IconsaxPlusBold.link_square),
+                    const Icon(IconsaxPlusBold.link),
                   ],
                 ),
               ),
@@ -277,7 +277,7 @@ class _LoginScreenCredentialsState extends ConsumerState<LoginScreenCredentials>
                         ),
                       ),
                       if (FladderConfig.seerrBaseUrl?.isNotEmpty != true)
-                        IconButton.filledTonal(
+                        IconButton(
                           onPressed: () async {
                             final tempSeerrUrl = ref.read(authProvider.select((value) => value.tempSeerrUrl));
                             final result = await showAdvancedLoginOptionsDialog(

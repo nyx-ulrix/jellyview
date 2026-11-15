@@ -634,7 +634,7 @@ mixin EpisodePicker<T extends ConsumerStatefulWidget> on ConsumerState<T> {
               return IconButton(
                 tooltip: allPicked ? 'Deselect all' : 'Select all',
                 onPressed: () => setState(() => allPicked ? picked.removeAll(all) : picked.addAll(all)),
-                icon: Icon(allPicked ? IconsaxPlusBold.tick_square : IconsaxPlusLinear.tick_square),
+                icon: Icon(allPicked ? IconsaxPlusBold.tick_circle : IconsaxPlusLinear.tick_circle),
               );
             }),
             IconButton(tooltip: 'Download', onPressed: downloadPicked, icon: const Icon(IconsaxPlusLinear.import_3)),

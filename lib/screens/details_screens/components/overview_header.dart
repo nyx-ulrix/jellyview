@@ -103,7 +103,7 @@ class OverviewHeader extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 8,
             children: [
-              const Icon(IconsaxPlusLinear.video_square),
+              const Icon(IconsaxPlusLinear.video_circle),
               Text(
                 mediaStreamHelper?.mediaStream.currentVersionStream?.detailedResolutionLabel ?? "",
               ),
@@ -135,7 +135,7 @@ class OverviewHeader extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 8,
             children: [
-              const Icon(IconsaxPlusLinear.audio_square),
+              const Icon(IconsaxPlusLinear.volume_high),
               Text(
                 mediaStreamHelper?.mediaStream.currentAudioStream?.shortTitle ?? "",
               ),

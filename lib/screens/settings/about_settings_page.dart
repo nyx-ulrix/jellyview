@@ -116,7 +116,7 @@ class _SocialsSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: socials
               .map(
-                (e) => IconButton.filledTonal(
+                (e) => IconButton(
                   onPressed: () => launchUrl(context, e.url),
                   icon: Column(
                     children: [
@@ -173,7 +173,7 @@ class _SponsorsSection extends StatelessWidget {
                   .map(
                     (sponsor) => Tooltip(
                       message: sponsor.platform,
-                      child: IconButton.filledTonal(
+                      child: IconButton(
                         onPressed: () => launchUrl(context, sponsor.url),
                         style: IconButton.styleFrom(
                           padding: const EdgeInsets.all(12),

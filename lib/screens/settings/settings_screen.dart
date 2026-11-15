@@ -208,7 +208,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             if (ref.watch(argumentsStateProvider.select((value) => value.htpcMode)))
               SettingsListTile(
                 label: Text(context.localized.exitFladderTitle),
-                icon: IconsaxPlusLinear.close_square,
+                icon: Icons.close_rounded,
                 onTap: () async {
                   showDefaultAlertDialog(
                     context,

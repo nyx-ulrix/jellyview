@@ -231,7 +231,7 @@ class _BookViewerControlsState extends ConsumerState<BookViewerControls> {
                                           : nextChapter?.name != null
                                               ? "Load ${nextChapter?.name}"
                                               : "",
-                                      child: IconButton.filled(
+                                      child: IconButton(
                                         onPressed: bookViewerSettings.readDirection == ReadDirection.leftToRight
                                             ? previousChapter != null
                                                 ? () async => await loadNextBook(previousChapter)
@@ -272,7 +272,7 @@ class _BookViewerControlsState extends ConsumerState<BookViewerControls> {
                                           : previousChapter?.name != null
                                               ? "Load ${previousChapter?.name}"
                                               : "",
-                                      child: IconButton.filled(
+                                      child: IconButton(
                                         onPressed: bookViewerSettings.readDirection == ReadDirection.leftToRight
                                             ? nextChapter != null
                                                 ? () async => await loadNextBook(nextChapter)

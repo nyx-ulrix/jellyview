@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart';
 import 'package:fladder/providers/control_panel/control_tuner_edit_provider.dart';
@@ -321,7 +320,7 @@ class _TagInput extends StatelessWidget {
                           children: [
                             Text(t),
                             const Icon(
-                              IconsaxPlusLinear.close_square,
+                              Icons.close_rounded,
                               size: 18,
                             )
                           ],

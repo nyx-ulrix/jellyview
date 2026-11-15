@@ -139,7 +139,7 @@ class SeerrPosterCard extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  IconsaxPlusBold.add_square,
+                                  IconsaxPlusBold.add_circle,
                                   color: Theme.of(context).colorScheme.onPrimary,
                                   size: 21,
                                 ),

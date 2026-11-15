@@ -96,7 +96,7 @@ extension CollectionTypeExtension on CollectionType? {
   IconData getIconType(bool outlined) {
     switch (this) {
       case CollectionType.music:
-        return outlined ? IconsaxPlusLinear.music_square : IconsaxPlusBold.music_square;
+        return outlined ? IconsaxPlusLinear.music_circle : IconsaxPlusBold.music_circle;
       case CollectionType.movies:
         return outlined ? IconsaxPlusLinear.video_horizontal : IconsaxPlusBold.video_horizontal;
       case CollectionType.tvshows:
@@ -112,7 +112,7 @@ extension CollectionTypeExtension on CollectionType? {
       case CollectionType.playlists:
         return outlined ? IconsaxPlusLinear.archive : IconsaxPlusBold.archive;
       case CollectionType.livetv:
-        return outlined ? IconsaxPlusLinear.video_square : IconsaxPlusBold.video_square;
+        return outlined ? IconsaxPlusLinear.video_circle : IconsaxPlusBold.video_circle;
       default:
         return IconsaxPlusLinear.information;
     }

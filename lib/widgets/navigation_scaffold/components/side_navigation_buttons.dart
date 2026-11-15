@@ -170,8 +170,8 @@ class SideNavigationButtons extends ConsumerWidget {
                     icon: ExcludeFocus(
                       child: NavigationButton(
                         label: context.localized.other,
-                        selectedIcon: const Icon(IconsaxPlusLinear.arrow_square_down),
-                        icon: const Icon(IconsaxPlusLinear.arrow_square_down),
+                        selectedIcon: const Icon(IconsaxPlusLinear.arrow_circle_down),
+                        icon: const Icon(IconsaxPlusLinear.arrow_circle_down),
                         expanded: shouldExpand,
                         customIcon: usePostersForLibrary
                             ? ClipRRect(
@@ -179,7 +179,7 @@ class SideNavigationButtons extends ConsumerWidget {
                                 child: const SizedBox.square(
                                   dimension: 50,
                                   child: Card(
-                                    child: Icon(IconsaxPlusLinear.arrow_square_down),
+                                    child: Icon(IconsaxPlusLinear.arrow_circle_down),
                                   ),
                                 ),
                               )

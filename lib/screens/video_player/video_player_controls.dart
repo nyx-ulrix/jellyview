@@ -399,12 +399,11 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    // Back arrow, top left: leaves the player.
                     IconButton(
-                      onPressed: () => minimizePlayer(context),
-                      icon: const Icon(
-                        IconsaxPlusLinear.arrow_down_1,
-                        size: 24,
-                      ),
+                      tooltip: context.localized.stop,
+                      onPressed: () => closePlayer(),
+                      icon: const Icon(Icons.arrow_back_rounded, size: 26),
                     ),
                     if (currentItem != null)
                       Expanded(
@@ -425,14 +424,7 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
                           ],
                         ),
                       ),
-                    if (initInputDevice == InputDevice.touch)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Tooltip(
-                            message: context.localized.stop,
-                            child: IconButton(
-                                onPressed: () => closePlayer(), icon: const Icon(IconsaxPlusLinear.close_square))),
-                      ),
+
                   ],
                 ),
               ),
@@ -505,7 +497,7 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
                           ),
                           IconButton(
                             onPressed: () => showAudioSelection(context),
-                            icon: const Icon(IconsaxPlusLinear.audio_square),
+                            icon: const Icon(IconsaxPlusLinear.volume_high),
                           ),
                         ],
                         if (AdaptiveLayout.layoutOf(context) >= ViewSize.desktop) ...[
@@ -526,7 +518,7 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
                           Flexible(
                             child: ElevatedButton.icon(
                               onPressed: () => showAudioSelection(context),
-                              icon: const Icon(IconsaxPlusLinear.audio_square),
+                              icon: const Icon(IconsaxPlusLinear.volume_high),
                               label: Text(
                                 ref.watch(playBackModel.select((value) {
                                       final language = value?.mediaStreams?.currentAudioStream?.language;
@@ -546,7 +538,7 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
                   previousButton,
                   previousChapterButton(ref),
                   seekBackwardButton(ref),
-                  IconButton.filledTonal(
+                  IconButton(
                     iconSize: isPhone ? 32 : 38,
                     onPressed: () {
                       ref.read(videoPlayerProvider).playOrPause();
@@ -563,14 +555,7 @@ class _DesktopControlsState extends ConsumerState<DesktopControls> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (initInputDevice == InputDevice.pointer || AdaptiveLayout.of(context).isDesktop)
-                          Tooltip(
-                            message: context.localized.stop,
-                            child: IconButton(
-                              onPressed: () => closePlayer(),
-                              icon: const Icon(IconsaxPlusLinear.close_square),
-                            ),
-                          ),
+
                         const Spacer(),
                         if (AdaptiveLayout.viewSizeOf(context) >= ViewSize.tablet &&
                             ref.read(videoPlayerProvider).hasPlayer) ...{

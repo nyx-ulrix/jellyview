@@ -134,7 +134,7 @@ class MusicPlaylistRow extends ConsumerWidget {
                               focusedOverlays: [
                                 Align(
                                   alignment: Alignment.center,
-                                  child: IconButton.filledTonal(
+                                  child: IconButton(
                                     onPressed: () => onPlaylistPlayTap(playlist),
                                     icon: const Icon(
                                       IconsaxPlusBold.play,

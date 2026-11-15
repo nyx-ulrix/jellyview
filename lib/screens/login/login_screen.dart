@@ -84,7 +84,7 @@ class _LoginPageState extends ConsumerState<LoginScreen> {
                     context: context,
                     key: const Key("new_user_button"),
                     heroTag: "new_user_button",
-                    child: const Icon(IconsaxPlusLinear.add_square),
+                    child: const Icon(IconsaxPlusLinear.add_circle),
                     onPressed: () => ref.read(authProvider.notifier).addNewUser(),
                   ).normal,
                   if (accounts.isNotEmpty)
