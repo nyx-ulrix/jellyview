@@ -284,7 +284,7 @@ class FilterListItem extends ConsumerWidget {
             ),
             if (smallSize)
               PopupMenuButton(
-                icon: const Icon(IconsaxPlusLinear.more),
+                icon: const Icon(IconsaxPlusBold.more),
                 itemBuilder: (context) => filterActions(filter).map((e) => e.toPopupMenuItem(useIcons: true)).toList(),
               )
             else

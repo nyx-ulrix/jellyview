@@ -41,7 +41,7 @@ class NestedSliverAppBar extends ConsumerWidget {
                 children: [
                   IconButton(
                     onPressed: () => Scaffold.of(parent).openDrawer(),
-                    icon: const Icon(IconsaxPlusLinear.more),
+                    icon: const Icon(IconsaxPlusBold.more),
                   ),
                 ],
               ),
@@ -86,7 +86,7 @@ class HomeTopBar extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () => Scaffold.of(parent).openDrawer(),
-                icon: const Icon(IconsaxPlusLinear.more, shadows: [Shadow(blurRadius: 8)]),
+                icon: const Icon(IconsaxPlusBold.more, shadows: [Shadow(blurRadius: 8)]),
               ),
             ],
           ),

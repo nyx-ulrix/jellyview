@@ -171,7 +171,7 @@ class SideNavigationRail extends ConsumerWidget {
                                   icon: Icon(
                                     largeBar && expandedSideBar
                                         ? IconsaxPlusLinear.sidebar_left
-                                        : IconsaxPlusLinear.more,
+                                        : IconsaxPlusBold.more,
                                     color: Theme.of(context).colorScheme.onSurface.withValues(
                                           alpha: largeBar && expandedSideBar ? 0.65 : 1,
                                         ),

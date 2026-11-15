@@ -140,7 +140,7 @@ class _ItemDetailScreenState extends ConsumerState<EpisodeDetailScreen> {
                         );
                       },
                       selected: false,
-                      icon: IconsaxPlusLinear.more,
+                      icon: IconsaxPlusBold.more,
                     ),
                   ].nonNulls.toList(),
                 ),

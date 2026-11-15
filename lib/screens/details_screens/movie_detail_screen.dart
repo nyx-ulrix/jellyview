@@ -128,7 +128,7 @@ class _ItemDetailScreenState extends ConsumerState<MovieDetailScreen> {
                         );
                       },
                       selected: false,
-                      icon: IconsaxPlusLinear.more,
+                      icon: IconsaxPlusBold.more,
                     ),
                   ],
                 ),
