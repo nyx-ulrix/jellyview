@@ -179,8 +179,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             .takeWhile(loadedSections.contains)
             .toList();
 
-    final viewSize = AdaptiveLayout.viewSizeOf(context);
-    final floatingTopBar = viewSize == ViewSize.phone && showsBanner;
+    final floatingTopBar = usesBottomNav(context) && showsBanner;
 
     final useTVExpandedLayout = ref.watch(clientSettingsProvider.select((value) => value.useTVExpandedLayout));
 
@@ -216,7 +215,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               slivers: [
                 // The slideshow starts at the very top (it fades into the status bar itself).
                 if (!showsBanner) const DefaultSliverTopBadding(),
-                if (viewSize == ViewSize.phone && !floatingTopBar)
+                if (usesBottomNav(context) && !floatingTopBar)
                   NestedSliverAppBar(
                     route: LibrarySearchRoute(),
                     parent: context,

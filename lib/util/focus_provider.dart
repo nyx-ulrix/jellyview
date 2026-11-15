@@ -31,7 +31,8 @@ class FocusProvider extends InheritedWidget {
     return widget?.hasFocus ?? false;
   }
 
-  static bool canAutoFocus(BuildContext context) => TickerMode.valuesOf(context).enabled && (ModalRoute.isCurrentOf(context) ?? true);
+  static bool canAutoFocus(BuildContext context) =>
+      TickerMode.valuesOf(context).enabled && (ModalRoute.isCurrentOf(context) ?? true);
 
   static bool autoFocusOf(BuildContext context) {
     final widget = context.dependOnInheritedWidgetOfExactType<FocusProvider>();

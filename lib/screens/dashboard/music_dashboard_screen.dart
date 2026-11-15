@@ -76,7 +76,6 @@ class _MusicDashboardScreenState extends ConsumerState<MusicDashboardScreen> {
       ref.read(musicDashboardProvider.notifier).fetchDashboardFilters();
     });
     final useTVExpandedLayout = ref.watch(clientSettingsProvider.select((value) => value.useTVExpandedLayout));
-    final viewSize = AdaptiveLayout.viewSizeOf(context);
     final layoutMode = AdaptiveLayout.of(context).layoutMode;
 
     final backgroundItems = [
@@ -139,7 +138,7 @@ class _MusicDashboardScreenState extends ConsumerState<MusicDashboardScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               const DefaultSliverTopBadding(),
-              if (viewSize == ViewSize.phone)
+              if (usesBottomNav(context))
                 NestedSliverAppBar(
                   route: LibrarySearchRoute(),
                   parent: context,

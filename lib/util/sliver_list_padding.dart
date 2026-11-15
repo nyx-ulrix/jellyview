@@ -18,7 +18,7 @@ class DefaultSliverTopBadding extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (AdaptiveLayout.viewSizeOf(context) == ViewSize.phone)
+    return usesBottomNav(context)
         ? const SliverToBoxAdapter()
         : SliverPadding(
             padding:

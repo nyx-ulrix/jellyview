@@ -101,8 +101,7 @@ int? subtitleIndexByKeyword(List<AudioAndSubStreamModel> subs, String? preferenc
   var bestScore = 0;
   for (final s in subs) {
     if (s.index == -1) continue;
-    final tokens =
-        '${s.language} ${s.name} ${s.displayTitle}'.toLowerCase().split(RegExp(r'[^a-z]+')).toSet();
+    final tokens = '${s.language} ${s.name} ${s.displayTitle}'.toLowerCase().split(RegExp(r'[^a-z]+')).toSet();
     // Two-letter codes only count in the language tag ("hi" in "English (HI)" is not Hindi).
     final language = s.language.toLowerCase().trim();
     final matches = keys.any((k) => k.length > 2 ? tokens.contains(k) : k == language);

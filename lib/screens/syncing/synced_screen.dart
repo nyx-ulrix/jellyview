@@ -68,7 +68,7 @@ class _SyncedScreenState extends ConsumerState<SyncedScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           controller: AdaptiveLayout.scrollOf(context, HomeTabs.sync),
           slivers: [
-            if (AdaptiveLayout.viewSizeOf(context) == ViewSize.phone)
+            if (usesBottomNav(context))
               NestedSliverAppBar(
                 parent: context,
                 route: LibrarySearchRoute(),

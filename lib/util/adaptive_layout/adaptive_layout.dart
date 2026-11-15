@@ -27,6 +27,12 @@ enum InputDevice {
   dPad,
 }
 
+/// Phones and tablets (touch screens, not TVs) get the phone layout: a tab bar at the bottom and a menu
+/// button, never the side rail, which covered content on tablets.
+bool usesBottomNav(BuildContext context) =>
+    AdaptiveLayout.inputDeviceOf(context) == InputDevice.touch &&
+    AdaptiveLayout.viewSizeOf(context) < ViewSize.television;
+
 enum ViewSize {
   phone,
   tablet,

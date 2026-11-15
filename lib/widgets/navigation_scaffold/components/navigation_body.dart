@@ -73,33 +73,35 @@ class _NavigationBodyState extends ConsumerState<NavigationBody> {
     return BackIntentDpad(
       child: FocusTraversalGroup(
         policy: GlobalFallbackTraversalPolicy(fallbackNode: navBarNode),
-        child: switch (AdaptiveLayout.layoutOf(context)) {
-          ViewSize.phone => paddedChild(),
-          ViewSize.tablet => hasOverlay
-              ? SideNavigationRail(
-                  currentIndex: widget.currentIndex,
-                  destinations: widget.destinations,
-                  currentLocation: widget.currentLocation,
-                  child: paddedChild(),
-                  scaffoldKey: widget.drawerKey,
-                )
-              : paddedChild(),
-          ViewSize.desktop || ViewSize.television => newTVLayout
-              ? TopNavigationBar(
-                  currentIndex: widget.currentIndex,
-                  destinations: widget.destinations,
-                  currentLocation: widget.currentLocation,
-                  child: paddedChild(),
-                  scaffoldKey: widget.drawerKey,
-                )
-              : SideNavigationRail(
-                  currentIndex: widget.currentIndex,
-                  destinations: widget.destinations,
-                  currentLocation: widget.currentLocation,
-                  child: paddedChild(),
-                  scaffoldKey: widget.drawerKey,
-                ),
-        },
+        child: usesBottomNav(context)
+            ? paddedChild()
+            : switch (AdaptiveLayout.layoutOf(context)) {
+                ViewSize.phone => paddedChild(),
+                ViewSize.tablet => hasOverlay
+                    ? SideNavigationRail(
+                        currentIndex: widget.currentIndex,
+                        destinations: widget.destinations,
+                        currentLocation: widget.currentLocation,
+                        child: paddedChild(),
+                        scaffoldKey: widget.drawerKey,
+                      )
+                    : paddedChild(),
+                ViewSize.desktop || ViewSize.television => newTVLayout
+                    ? TopNavigationBar(
+                        currentIndex: widget.currentIndex,
+                        destinations: widget.destinations,
+                        currentLocation: widget.currentLocation,
+                        child: paddedChild(),
+                        scaffoldKey: widget.drawerKey,
+                      )
+                    : SideNavigationRail(
+                        currentIndex: widget.currentIndex,
+                        destinations: widget.destinations,
+                        currentLocation: widget.currentLocation,
+                        child: paddedChild(),
+                        scaffoldKey: widget.drawerKey,
+                      ),
+              },
       ),
     );
   }

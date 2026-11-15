@@ -43,7 +43,7 @@ class FavouritesScreen extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             controller: AdaptiveLayout.scrollOf(context, HomeTabs.favorites),
             slivers: [
-              if (AdaptiveLayout.viewSizeOf(context) == ViewSize.phone)
+              if (usesBottomNav(context))
                 NestedSliverAppBar(
                   parent: context,
                   route: LibrarySearchRoute(favourites: true),

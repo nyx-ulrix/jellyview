@@ -69,7 +69,7 @@ class _SeerrScreenState extends ConsumerState<SeerrScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             controller: AdaptiveLayout.scrollOf(context, HomeTabs.seerr),
             slivers: [
-              if (AdaptiveLayout.viewSizeOf(context) == ViewSize.phone)
+              if (usesBottomNav(context))
                 NestedSliverAppBar(parent: context)
               else
                 const DefaultSliverTopBadding(),

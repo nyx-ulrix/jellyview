@@ -1,7 +1,8 @@
 import 'package:collection/collection.dart';
 
 extension ListExtensions<T> on List<T> {
-  void reorderInPlace(int oldIndex, int newIndex) => moveInPlace(oldIndex, oldIndex < newIndex ? newIndex - 1 : newIndex);
+  void reorderInPlace(int oldIndex, int newIndex) =>
+      moveInPlace(oldIndex, oldIndex < newIndex ? newIndex - 1 : newIndex);
 
   void moveInPlace(int oldIndex, int newIndex) {
     if (oldIndex == newIndex) {

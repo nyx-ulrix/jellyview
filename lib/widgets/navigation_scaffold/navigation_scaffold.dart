@@ -127,18 +127,18 @@ class _NavigationScaffoldState extends ConsumerState<NavigationScaffold> {
         extendBodyBehindAppBar: true,
         resizeToAvoidBottomInset: false,
         extendBody: true,
-        floatingActionButton:
-            !showAudioFullScreen && AdaptiveLayout.layoutModeOf(scaffoldContext) == LayoutMode.single && isHomeScreen
-                ? widget.destinations.elementAtOrNull(currentIndex)?.floatingActionButton?.normal
-                : null,
+        floatingActionButton: !showAudioFullScreen &&
+                (AdaptiveLayout.layoutModeOf(scaffoldContext) == LayoutMode.single || usesBottomNav(scaffoldContext)) &&
+                isHomeScreen
+            ? widget.destinations.elementAtOrNull(currentIndex)?.floatingActionButton?.normal
+            : null,
         drawer: drawer != null ? DrawerBackGesture(child: drawer) : null,
         // Wider than Android's own edge-back zone, so a swipe in from the left opens the menu.
         drawerEdgeDragWidth: 48,
         bottomNavigationBar: AdaptiveLayout.viewSizeOf(scaffoldContext) == ViewSize.television
             ? SizedBox(height: calculatedBottomViewPadding)
             : AnimatedVisibility(
-                visible: !showAudioFullScreen &&
-                    (isHomeScreen && AdaptiveLayout.viewSizeOf(scaffoldContext) == ViewSize.phone),
+                visible: !showAudioFullScreen && (isHomeScreen && usesBottomNav(scaffoldContext)),
                 hiddenHeight: calculatedBottomViewPadding,
                 duration: const Duration(milliseconds: 250),
                 child: HideOnScroll(
