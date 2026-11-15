@@ -95,6 +95,15 @@ class SideNavigationRail extends ConsumerWidget {
           ),
           child: child,
         ),
+        // Expanded menu on a touch screen: touching anywhere outside it closes it (the touch still goes through).
+        if (largeBar && expandedSideBar && AdaptiveLayout.inputDeviceOf(context) == InputDevice.touch)
+          Positioned.fill(
+            child: Listener(
+              behavior: HitTestBehavior.translucent,
+              onPointerDown: (_) =>
+                  ref.read(clientSettingsProvider.notifier).update((state) => state.copyWith(expandSideBar: false)),
+            ),
+          ),
         Positioned.fill(
           child: Align(
             alignment: AlignmentDirectional.topStart,
@@ -166,12 +175,11 @@ class SideNavigationRail extends ConsumerWidget {
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 14),
                                 child: CollapseButton(
-                                  label: shouldExpand ? Expanded(child: Text(context.localized.navigation)) : null,
-                                  keepVisible: !(largeBar && expandedSideBar),
+                                  label: null,
+                                  // Always visible: on touch there's no hover to reveal it.
+                                  keepVisible: true,
                                   icon: Icon(
-                                    largeBar && expandedSideBar
-                                        ? IconsaxPlusLinear.sidebar_left
-                                        : IconsaxPlusBold.more,
+                                    largeBar && expandedSideBar ? IconsaxPlusLinear.sidebar_left : Icons.more_horiz,
                                     color: Theme.of(context).colorScheme.onSurface.withValues(
                                           alpha: largeBar && expandedSideBar ? 0.65 : 1,
                                         ),

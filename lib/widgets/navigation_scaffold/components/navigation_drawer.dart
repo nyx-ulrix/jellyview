@@ -43,14 +43,7 @@ class NestedNavigationDrawer extends ConsumerWidget {
           padding: EdgeInsets.fromLTRB(8, AdaptiveLayout.of(context).isDesktop || kIsWeb ? 0 : 16, 16, 0),
           child: Row(
             children: [
-              Expanded(
-                child: Text(
-                  context.localized.navigation,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
-                      ),
-                ),
-              ),
+              const Spacer(),
               IconButton(
                 onPressed: () => toggleExpanded(false),
                 icon: const Icon(IconsaxPlusLinear.sidebar_left),

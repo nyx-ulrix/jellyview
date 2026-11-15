@@ -195,9 +195,7 @@ class SideNavigationButtons extends ConsumerWidget {
                             child: Row(
                               spacing: 8,
                               children: [
-                                usePostersForLibrary
-                                    ? e.createIcon(context, selected: false)
-                                    : const SizedBox.shrink(),
+                                usePostersForLibrary ? e.createIcon(context, selected: false) : const SizedBox.shrink(),
                                 Text(e.name),
                               ],
                             ),

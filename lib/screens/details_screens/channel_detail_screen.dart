@@ -107,7 +107,7 @@ class _ChannelDetailScreenState extends ConsumerState<ChannelDetailScreen> {
                                 );
                               },
                               selected: false,
-                              icon: IconsaxPlusBold.more,
+                              icon: Icons.more_horiz,
                             ),
                           ],
                         ),

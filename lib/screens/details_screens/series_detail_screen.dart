@@ -166,7 +166,7 @@ class _SeriesDetailScreenState extends ConsumerState<SeriesDetailScreen> {
                       },
                       selected: false,
                       refreshOnEnd: false,
-                      icon: IconsaxPlusBold.more,
+                      icon: Icons.more_horiz,
                     ),
                   ],
                 ),
