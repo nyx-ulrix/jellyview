@@ -1,0 +1,281 @@
+import 'package:flutter/material.dart';
+
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
+
+import 'package:fladder/models/item_base_model.dart';
+import 'package:fladder/models/items/series_model.dart';
+import 'package:fladder/providers/items/series_details_provider.dart';
+import 'package:fladder/providers/user_provider.dart';
+import 'package:fladder/routes/auto_router.gr.dart';
+import 'package:fladder/screens/details_screens/components/media_stream_information.dart';
+import 'package:fladder/screens/details_screens/components/overview_header.dart';
+import 'package:fladder/screens/seerr/widgets/seerr_poster_row.dart';
+import 'package:fladder/screens/shared/detail_scaffold.dart';
+import 'package:fladder/screens/shared/media/components/media_play_button.dart';
+import 'package:fladder/screens/shared/media/episode_posters.dart';
+import 'package:fladder/screens/shared/media/expanding_text.dart';
+import 'package:fladder/screens/shared/media/external_urls.dart';
+import 'package:fladder/screens/shared/media/people_row.dart';
+import 'package:fladder/screens/shared/media/poster_row.dart';
+import 'package:fladder/screens/shared/media/season_row.dart';
+import 'package:fladder/screens/shared/media/special_features_row.dart';
+import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
+import 'package:fladder/util/item_base_model/item_base_model_extensions.dart';
+import 'package:fladder/util/item_base_model/play_item_helpers.dart';
+import 'package:fladder/util/list_padding.dart';
+import 'package:fladder/util/localization_helper.dart';
+import 'package:fladder/util/router_extension.dart';
+import 'package:fladder/widgets/shared/ensure_visible.dart';
+import 'package:fladder/widgets/shared/item_actions.dart';
+import 'package:fladder/widgets/shared/modal_bottom_sheet.dart';
+import 'package:fladder/widgets/shared/selectable_icon_button.dart';
+
+class SeriesDetailScreen extends ConsumerStatefulWidget {
+  final ItemBaseModel item;
+  const SeriesDetailScreen({required this.item, super.key});
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _SeriesDetailScreenState();
+}
+
+class _SeriesDetailScreenState extends ConsumerState<SeriesDetailScreen> {
+  AutoDisposeStateNotifierProvider<SeriesDetailViewNotifier, SeriesModel?> get providerId =>
+      seriesDetailsProvider(widget.item.id);
+
+  @override
+  Widget build(BuildContext context) {
+    final details = ref.watch(providerId);
+    final wrapAlignment =
+        AdaptiveLayout.viewSizeOf(context) != ViewSize.phone ? WrapAlignment.start : WrapAlignment.center;
+
+    final currentEpisode = details?.nextUp;
+
+    return DetailScaffold(
+      label: details?.name ?? "",
+      item: details,
+      actions: (context) => details?.generateActions(
+        context,
+        ref,
+        exclude: {
+          ItemActions.play,
+          ItemActions.playFromStart,
+          ItemActions.details,
+        },
+        onDeleteSuccesFully: (item) {
+          if (context.mounted) {
+            context.router.popBack();
+          }
+        },
+      ),
+      onRefresh: () => ref.read(providerId.notifier).fetchDetails(widget.item),
+      backDrops: details?.images,
+      content: (detailsContext, padding) => details != null
+          ? [
+              OverviewHeader(
+                name: details.name,
+                image: details.images,
+                mainButton: currentEpisode != null
+                    ? MediaPlayButton(
+                        item: currentEpisode,
+                        onPressed: (restart) async {
+                          await currentEpisode.play(
+                            detailsContext,
+                            ref,
+                            startPosition: restart ? Duration.zero : null,
+                          );
+                          ref.read(providerId.notifier).fetchDetails(widget.item);
+                        },
+                        onLongPressed: (restart) async {
+                          await currentEpisode.play(
+                            detailsContext,
+                            ref,
+                            showPlaybackOption: true,
+                            startPosition: restart ? Duration.zero : null,
+                          );
+                          ref.read(providerId.notifier).fetchDetails(widget.item);
+                        },
+                      )
+                    : null,
+                centerButtons: Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  alignment: wrapAlignment,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    SelectableIconButton(
+                      onPressed: () async {
+                        await ref.read(userProvider.notifier).setAsFavorite(!details.userData.isFavourite, details.id);
+                      },
+                      selected: details.userData.isFavourite,
+                      selectedIcon: IconsaxPlusBold.heart,
+                      icon: IconsaxPlusLinear.heart,
+                    ),
+                    SelectableIconButton(
+                      onPressed: () async {
+                        await ref.read(userProvider.notifier).markAsPlayed(!details.userData.played, details.id);
+                      },
+                      selected: details.userData.played,
+                      selectedIcon: IconsaxPlusBold.tick_circle,
+                      icon: IconsaxPlusLinear.tick_circle,
+                    ),
+                    SelectableIconButton(
+                      onPressed: () => showBottomSheetPill(
+                        context: detailsContext,
+                        content: (context, scrollController) => ListView(
+                          controller: scrollController,
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.only(bottom: 24),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              child: Text('About ${details.name}', style: Theme.of(context).textTheme.titleLarge),
+                            ),
+                            if (details.overview.summary.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                child: Text(details.overview.summary),
+                              ),
+                            if (details.overview.people.isNotEmpty)
+                              PeopleRow(
+                                people: details.overview.people,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                              ),
+                          ],
+                        ),
+                      ),
+                      selected: false,
+                      refreshOnEnd: false,
+                      icon: IconsaxPlusLinear.info_circle,
+                    ),
+                    SelectableIconButton(
+                      onPressed: () {
+                        showBottomSheetPill(
+                          context: detailsContext,
+                          item: details,
+                          content: (context, scrollController) => ListView(
+                            controller: scrollController,
+                            shrinkWrap: true,
+                            children: details.generateActions(detailsContext, ref, exclude: {
+                              ItemActions.openParent,
+                              ItemActions.details
+                            }).listTileItems(context, useIcons: true),
+                          ),
+                        );
+                      },
+                      selected: false,
+                      refreshOnEnd: false,
+                      icon: IconsaxPlusLinear.more,
+                    ),
+                  ],
+                ),
+                padding: padding,
+                originalTitle: details.originalTitle,
+                productionYear: details.overview.yearAired.toString(),
+                runTime: details.overview.runTime,
+                studios: details.overview.studios,
+                officialRating: details.overview.parentalRating,
+                genres: details.overview.genreItems,
+                onGenreClicked: (genre) {
+                  final itemViewId = details.parentId ?? "";
+                  LibrarySearchRoute(
+                    parentId: [itemViewId],
+                    genres: {genre.name: true},
+                  ).push(context);
+                },
+                mediaStreamHelper: currentEpisode?.mediaStreams != null
+                    ? MediaStreamHelper(
+                        mediaStream: currentEpisode!.mediaStreams,
+                        onItemChanged: (changed) {
+                          final updateEpisode = currentEpisode.copyWith(
+                            mediaStreams: changed,
+                          );
+                          ref.read(providerId.notifier).updateEpisodeInfo(updateEpisode);
+                        },
+                      )
+                    : null,
+                communityRating: details.overview.communityRating,
+              ),
+              if (details.overview.summary.isNotEmpty)
+                Padding(
+                  padding: padding,
+                  child: Builder(builder: (context) {
+                    return ExpandingText(
+                      text: details.overview.summary,
+                      onFocusChange: (onFocus) {
+                        if (onFocus) {
+                          context.ensureVisible(alignment: 1);
+                        }
+                      },
+                    );
+                  }),
+                ),
+              if (details.availableEpisodes?.isNotEmpty ?? false)
+                Builder(builder: (context) {
+                  return EpisodePosters(
+                    vertical: true,
+                    contentPadding: padding,
+                    selectedEpisode: currentEpisode,
+                    seasons: details.seasons ?? [],
+                    titleActionsPosition:
+                        AdaptiveLayout.inputDeviceOf(context) == InputDevice.dPad ? null : VerticalDirection.down,
+                    label: context.localized.episode(details.availableEpisodes?.length ?? 2),
+                    revealAlignment: 0.8,
+                    // Tapping an episode plays it straight away (TV remote layout too).
+                    onEpisodeTap: (action, episode) async {
+                      if (!episode.playAble) return action();
+                      await episode.play(context, ref);
+                      ref.read(providerId.notifier).fetchDetails(widget.item);
+                    },
+                    playEpisode: (episode) async {
+                      await episode.play(
+                        context,
+                        ref,
+                      );
+                      ref.read(providerId.notifier).fetchDetails(widget.item);
+                    },
+                    episodes: details.availableEpisodes ?? [],
+                  );
+                }),
+              // Touch uses the season chips above the episodes; the poster row is for TV remotes.
+              if ((details.seasons?.isNotEmpty ?? false) && AdaptiveLayout.inputDeviceOf(context) == InputDevice.dPad)
+                SeasonsRow(
+                  contentPadding: padding,
+                  seasons: details.seasons,
+                ),
+              if (details.specialFeatures?.isNotEmpty ?? false)
+                SpecialFeaturesRow(
+                    contentPadding: padding,
+                    label: detailsContext.localized.specialFeature(details.specialFeatures?.length ?? 2),
+                    specialFeatures: details.specialFeatures ?? []),
+              if (details.related.isNotEmpty)
+                PosterRow(
+                  posters: details.related,
+                  contentPadding: padding,
+                  label: detailsContext.localized.related,
+                ),
+              if (details.seerrRecommended.isNotEmpty)
+                SeerrPosterRow(
+                  posters: details.seerrRecommended,
+                  label: "${detailsContext.localized.discover} ${detailsContext.localized.recommended.toLowerCase()}",
+                  contentPadding: padding,
+                ),
+              if (details.seerrRelated.isNotEmpty)
+                SeerrPosterRow(
+                  posters: details.seerrRelated,
+                  label: "${detailsContext.localized.discover} ${detailsContext.localized.related.toLowerCase()}",
+                  contentPadding: padding,
+                ),
+              if (details.overview.externalUrls?.isNotEmpty == true)
+                Padding(
+                  padding: padding,
+                  child: ExternalUrlsRow(
+                    urls: details.overview.externalUrls,
+                  ),
+                )
+            ].addPadding(const EdgeInsets.symmetric(vertical: 16))
+          : [],
+    );
+  }
+}
