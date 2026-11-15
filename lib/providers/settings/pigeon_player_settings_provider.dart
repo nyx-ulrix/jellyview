@@ -73,7 +73,8 @@ final pigeonPlayerSettingsSyncProvider = Provider<void>((ref) {
             BoxFit.none => pigeon.VideoPlayerFit.none,
             BoxFit.scaleDown => pigeon.VideoPlayerFit.scaleDown,
           },
-          acceptedOrientations: value.playerOrientations.toList()
+          acceptedOrientations: value.playerOrientations
+              .toList()
               .map(
                 (e) => switch (e) {
                   DeviceOrientation.portraitUp => pigeon.PlayerOrientations.portraitUp,

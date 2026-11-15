@@ -87,6 +87,39 @@ class DelugeApi {
   Future<Map<String, dynamic>> missing(String kind, int id, {int? season}) async => Map<String, dynamic>.from(
       await post('/api/missing', {'kind': kind, 'id': id, if (season != null) 'season': season}) as Map);
 
+  // ---- Library management (the dashboard's Library page) ----
+  Future<List<Map<String, dynamic>>> shows() async => List<Map<String, dynamic>>.from(await get('/api/shows') as List);
+
+  Future<List<Map<String, dynamic>>> movies() async =>
+      List<Map<String, dynamic>>.from(await get('/api/movies') as List);
+
+  /// Tracked show: every new episode downloads when it airs.
+  Future<dynamic> track(int id, bool on) => post('/api/track', {'id': id, 'on': on});
+
+  Future<dynamic> upgrade(String kind, int id) => post('/api/upgrade', {'kind': kind, 'id': id});
+
+  Future<dynamic> noUpgrade(String kind, int id) => post('/api/no-upgrade', {'kind': kind, 'id': id});
+
+  Future<dynamic> allowUpgrades(String kind, int id) => post('/api/allow-upgrades', {'kind': kind, 'id': id});
+
+  Future<dynamic> setUhd(String kind, int id, bool uhd) => post('/api/quality', {'kind': kind, 'id': id, 'uhd': uhd});
+
+  Future<dynamic> subtitles(String kind, int id) => post('/api/subtitles', {'kind': kind, 'id': id});
+
+  Future<dynamic> get4k(String kind, int id) => post('/api/get4k', {'kind': kind, 'id': id});
+
+  /// Other copies of a download that could be used instead (with seeders, size, quality).
+  Future<Map<String, dynamic>> sources(String hash) async =>
+      Map<String, dynamic>.from(await get('/api/sources', {'hash': hash}) as Map);
+
+  Future<dynamic> useSource(String hash, int pick) => post('/api/source', {'hash': hash, 'pick': pick});
+
+  /// How many downloads run at once.
+  Future<Map<String, dynamic>> setActive(int n) async =>
+      Map<String, dynamic>.from(await post('/api/active', {'n': n}) as Map);
+
+  Future<dynamic> delete(String kind, int id) => post('/api/delete', {'kind': kind, 'id': id, 'confirm': 'delete'});
+
   Future<void> itemAction(String hash, String action) => post('/api/item', {'hash': hash, 'action': action});
 
   Future<void> cancel({String? hash, String? group}) =>
@@ -94,6 +127,19 @@ class DelugeApi {
 
   Future<Map<String, dynamic>> setPaused(bool on) async =>
       Map<String, dynamic>.from(await post('/api/pause', {'on': on}) as Map);
+}
+
+/// Liked shows are tracked by the media server itself: this hands it this device's Jellyfin sign-in once,
+/// then the server checks every 15 minutes for liked shows and tracks them in Sonarr, whether or not the
+/// app is open (and no app setting can switch it off). Returns any titles it tracked right away.
+final trackLikedShowsProvider = FutureProvider.autoDispose<List<String>>((ref) => trackLikedShows(ref));
+
+Future<List<String>> trackLikedShows(Ref ref) async {
+  final api = ref.read(delugeApiProvider);
+  final user = ref.read(userProvider);
+  if (api.base.isEmpty || user == null || user.credentials.token.isEmpty) return [];
+  final result = await api.post('/api/jellyfin-link', {'token': user.credentials.token, 'userId': user.id});
+  return List<String>.from((result as Map?)?['tracked'] as List? ?? const []);
 }
 
 /// "2.03:04:05" (qBittorrent) or "03:04:05" (Sonarr/Radarr) -> "2d 3h" / "3h 4m" / "4m".

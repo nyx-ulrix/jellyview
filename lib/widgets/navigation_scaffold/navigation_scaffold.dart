@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide ConnectionState;
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'package:fladder/models/items/audio_model.dart';
 import 'package:fladder/models/media_playback_model.dart';
@@ -10,6 +11,9 @@ import 'package:fladder/providers/video_player_provider.dart';
 import 'package:fladder/providers/views_provider.dart';
 import 'package:fladder/providers/window_title_provider.dart';
 import 'package:fladder/routes/auto_router.dart';
+import 'package:fladder/routes/auto_router.gr.dart';
+import 'package:fladder/util/localization_helper.dart';
+import 'package:fladder/widgets/navigation_scaffold/components/navigation_button.dart';
 import 'package:fladder/screens/home_screen.dart';
 import 'package:fladder/screens/shared/animated_fade_size.dart';
 import 'package:fladder/screens/shared/nested_bottom_appbar.dart';
@@ -127,12 +131,15 @@ class _NavigationScaffoldState extends ConsumerState<NavigationScaffold> {
         extendBodyBehindAppBar: true,
         resizeToAvoidBottomInset: false,
         extendBody: true,
+        // Phones and tablets search from the pill at the top; no round button at the bottom.
         floatingActionButton: !showAudioFullScreen &&
-                (AdaptiveLayout.layoutModeOf(scaffoldContext) == LayoutMode.single || usesBottomNav(scaffoldContext)) &&
+                !usesBottomNav(scaffoldContext) &&
+                AdaptiveLayout.layoutModeOf(scaffoldContext) == LayoutMode.single &&
                 isHomeScreen
             ? widget.destinations.elementAtOrNull(currentIndex)?.floatingActionButton?.normal
             : null,
-        drawer: drawer != null ? DrawerBackGesture(child: drawer) : null,
+        // Phones and tablets: no side menu at all; everything is in the bottom bar.
+        drawer: drawer != null && !usesBottomNav(scaffoldContext) ? DrawerBackGesture(child: drawer) : null,
         // Wider than Android's own edge-back zone, so a swipe in from the left opens the menu.
         drawerEdgeDragWidth: 48,
         bottomNavigationBar: AdaptiveLayout.viewSizeOf(scaffoldContext) == ViewSize.television
@@ -150,15 +157,25 @@ class _NavigationScaffoldState extends ConsumerState<NavigationScaffold> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: widget.destinations
-                            .map(
-                              (destination) => destination.toNavigationButton(
-                                widget.currentRouteName == destination.route?.routeName,
-                                false,
-                                false,
-                              ),
-                            )
-                            .toList(),
+                        children: [
+                          ...widget.destinations.map(
+                            (destination) => destination.toNavigationButton(
+                              widget.currentRouteName == destination.route?.routeName,
+                              false,
+                              false,
+                            ),
+                          ),
+                          // Settings lives here now that the side menu is gone.
+                          NavigationButton(
+                            label: context.localized.settings,
+                            selected: currentLocation.contains(const SettingsRoute().routeName),
+                            horizontal: false,
+                            expanded: false,
+                            icon: const Icon(IconsaxPlusLinear.setting_2),
+                            selectedIcon: const Icon(IconsaxPlusBold.setting_2),
+                            onPressed: () => context.router.push(const SettingsRoute()),
+                          ),
+                        ],
                       ),
                     ),
                   ),

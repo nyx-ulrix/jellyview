@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
+
+import 'package:fladder/routes/auto_router.gr.dart';
 
 class NestedSliverAppBar extends ConsumerWidget {
   final BuildContext parent;
@@ -38,10 +41,7 @@ class NestedSliverAppBar extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 spacing: 12,
                 children: [
-                  IconButton(
-                    onPressed: () => Scaffold.of(parent).openDrawer(),
-                    icon: const Icon(Icons.more_horiz),
-                  ),
+                  Expanded(child: SearchPill(route: route)),
                 ],
               ),
             ),
@@ -83,10 +83,36 @@ class HomeTopBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 12,
             children: [
-              IconButton(
-                onPressed: () => Scaffold.of(parent).openDrawer(),
-                icon: const Icon(Icons.more_horiz, shadows: [Shadow(blurRadius: 8)]),
-              ),
+              const Expanded(child: SearchPill()),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Pill-shaped search bar at the top of the main pages; tapping it opens search.
+class SearchPill extends StatelessWidget {
+  final PageRouteInfo? route;
+  const SearchPill({this.route, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surfaceContainerHighest.withValues(alpha: 0.75),
+      shape: const StadiumBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.router.push(route ?? LibrarySearchRoute()),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            spacing: 10,
+            children: [
+              Icon(IconsaxPlusLinear.search_normal_1, size: 20, color: scheme.onSurfaceVariant),
+              Text('Search', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: scheme.onSurfaceVariant)),
             ],
           ),
         ),

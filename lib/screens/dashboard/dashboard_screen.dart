@@ -10,6 +10,7 @@ import 'package:fladder/jellyfin/jellyfin_open_api.enums.swagger.dart';
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart';
 import 'package:fladder/models/collection_types.dart';
 import 'package:fladder/models/item_base_model.dart';
+import 'package:fladder/models/items/episode_model.dart';
 import 'package:fladder/models/library_filters_model.dart';
 import 'package:fladder/models/library_search/library_search_options.dart';
 import 'package:fladder/models/media_playback_model.dart';
@@ -116,7 +117,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     try {
       await ref.read(userProvider.notifier).updateInformation();
       await ref.read(dashboardProvider.notifier).refreshDashboard();
-      if (ref.read(homeSettingsProvider).carouselSettings == HomeCarouselSettings.favourites) {
+      if (const {HomeCarouselSettings.favourites, HomeCarouselSettings.combined}
+          .contains(ref.read(homeSettingsProvider).carouselSettings)) {
         await ref.read(favouritesProvider.notifier).fetchFavourites();
       }
     } finally {
@@ -151,7 +153,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final allResume = [...resumeVideo, ...resumeAudio, ...resumeBooks].toList();
 
     final favourites = ref.watch(favouritesProvider.select((value) => value.favourites));
-    if (homeSettings.carouselSettings == HomeCarouselSettings.favourites &&
+    if (const {HomeCarouselSettings.favourites, HomeCarouselSettings.combined}
+            .contains(homeSettings.carouselSettings) &&
         favourites.isEmpty &&
         !_favouritesRequested) {
       _favouritesRequested = true;
@@ -160,7 +163,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
     final homeCarouselItems = switch (homeSettings.carouselSettings) {
       HomeCarouselSettings.nextUp => dashboardData.nextUp,
-      HomeCarouselSettings.combined => [...allResume, ...dashboardData.nextUp],
+      // Everything: what you're watching, what's next, then what you've liked; each show only once.
+      HomeCarouselSettings.combined => () {
+          final seen = <String>{};
+          return [
+            ...allResume,
+            ...dashboardData.nextUp,
+            ...?favourites[FladderItemType.movie],
+            ...?favourites[FladderItemType.series],
+          ]
+              // Episodes count as their show (so a liked show with a next-up episode appears once).
+              .where((item) => seen.add(item is EpisodeModel ? item.parentId ?? item.id : item.id))
+              .toList();
+        }(),
       HomeCarouselSettings.cont => allResume,
       HomeCarouselSettings.favourites => [
           ...?favourites[FladderItemType.movie],

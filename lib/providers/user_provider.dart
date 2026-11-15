@@ -15,6 +15,7 @@ import 'package:fladder/models/library_filters_model.dart';
 import 'package:fladder/models/seerr_credentials_model.dart';
 import 'package:fladder/models/settings/home_settings_model.dart';
 import 'package:fladder/providers/api_provider.dart';
+import 'package:fladder/providers/deluge_provider.dart';
 import 'package:fladder/providers/connectivity_provider.dart';
 import 'package:fladder/providers/image_provider.dart';
 import 'package:fladder/providers/service_provider.dart';
@@ -200,6 +201,8 @@ class User extends _$User {
     final response = await (favorite
         ? api.usersUserIdFavoriteItemsItemIdPost(itemId: itemId)
         : api.usersUserIdFavoriteItemsItemIdDelete(itemId: itemId));
+    // Liking a show also tracks it on the media server, so new episodes download as they air.
+    if (favorite) unawaited(trackLikedShows(ref).catchError((_) => <String>[]));
     return Response(response.base, UserData.fromDto(response.body));
   }
 

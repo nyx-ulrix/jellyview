@@ -8,6 +8,7 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 
 import 'package:fladder/providers/deluge_provider.dart';
+import 'package:fladder/screens/deluge/get_library_screen.dart';
 import 'package:fladder/screens/home_screen.dart';
 import 'package:fladder/theme.dart';
 import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
@@ -50,6 +51,10 @@ class _GetScreenState extends ConsumerState<GetScreen> {
   void initState() {
     super.initState();
     refresh();
+    // Catch up on shows liked before auto-tracking existed (or liked while the server was unreachable).
+    ref.read(trackLikedShowsProvider.future).then((titles) {
+      if (titles.isNotEmpty && mounted) toast('Now tracking ${titles.join(', ')} (you liked them)');
+    }).catchError((_) {});
     // ponytail: fixed 5 s poll while the tab is open; a push channel if the server ever grows one
     poll = Timer.periodic(const Duration(seconds: 5), (_) => refreshQueue());
   }
@@ -127,6 +132,115 @@ class _GetScreenState extends ConsumerState<GetScreen> {
             found = ((await api.missing('show', id, season: u['season'] as int?))['episodes'] as num? ?? 0).toInt(),
         'Searching for ${u['title']} ${u['ep']}');
     if (found == 0) toast('No release found to search for yet. Try again later.');
+  }
+
+  /// The dashboard's per-download tools: move in the line, lock the order, or pick another copy.
+  Future<void> showQueueMenu(Map<String, dynamic> q) async {
+    final hash = '${q['hash']}';
+    final locked = q['locked'] == true;
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(title: Text('${q['title']}', maxLines: 1, overflow: TextOverflow.ellipsis)),
+            ListTile(
+                leading: const Icon(IconsaxPlusLinear.arrow_up_1),
+                title: const Text('Download next'),
+                onTap: () => Navigator.pop(context, 'front')),
+            ListTile(
+                leading: const Icon(IconsaxPlusLinear.arrow_down),
+                title: const Text('Download last'),
+                onTap: () => Navigator.pop(context, 'last')),
+            ListTile(
+                leading: Icon(locked ? IconsaxPlusLinear.unlock : IconsaxPlusLinear.lock),
+                title: Text(locked ? 'Unlock its place in line' : 'Lock its place in line'),
+                onTap: () => Navigator.pop(context, locked ? 'unlock' : 'lock')),
+            ListTile(
+                leading: const Icon(IconsaxPlusLinear.arrow_swap_horizontal),
+                title: const Text('Choose another copy'),
+                subtitle: const Text('If this one is slow or stuck'),
+                onTap: () => Navigator.pop(context, 'source')),
+          ],
+        ),
+      ),
+    );
+    if (choice == null || !mounted) return;
+    if (choice == 'source') return chooseSource(hash);
+    const done = {'front': 'Moved to the front', 'last': 'Moved to the back', 'lock': 'Locked', 'unlock': 'Unlocked'};
+    await act(() => api.itemAction(hash, choice), done[choice]!);
+    await refreshQueue();
+  }
+
+  Future<void> chooseSource(String hash) async {
+    toast('Looking for other copies...');
+    Map<String, dynamic> found;
+    try {
+      found = await api.sources(hash);
+    } catch (e) {
+      return toast(e.toString().replaceFirst('Exception: ', ''));
+    }
+    if (!mounted) return;
+    final list = List<Map<String, dynamic>>.from(found['list'] as List? ?? const []);
+    if (list.isEmpty) return toast('No other copies found right now.');
+    final pick = await showModalBottomSheet<int>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.7),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              for (final (i, r) in list.indexed)
+                ListTile(
+                  title: Text('${r['title']}', maxLines: 2, overflow: TextOverflow.ellipsis),
+                  subtitle: Text([
+                    '${r['seeders']} seeders',
+                    formatBytes((r['size'] ?? 0) as num),
+                    if (r['quality'] != null) '${r['quality']}',
+                    if (r['blockedWhy'] != null) 'tried before: ${r['blockedWhy']}',
+                  ].join(' · ')),
+                  onTap: () => Navigator.pop(context, i),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (pick == null) return;
+    await act(() => api.useSource(hash, pick), 'Switched to the other copy');
+    await refreshQueue();
+  }
+
+  /// How many downloads run at the same time.
+  Future<void> setActiveDownloads() async {
+    var n = (pause?['active'] as num?)?.toInt() ?? 3;
+    final result = await showDialog<int>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setLocal) => AlertDialog(
+          title: const Text('Downloads at once'),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(onPressed: n > 1 ? () => setLocal(() => n--) : null, icon: const Icon(Icons.remove)),
+              Text('$n', style: Theme.of(context).textTheme.headlineSmall),
+              IconButton(onPressed: n < 10 ? () => setLocal(() => n++) : null, icon: const Icon(Icons.add)),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            FilledButton(onPressed: () => Navigator.pop(context, n), child: const Text('Save')),
+          ],
+        ),
+      ),
+    );
+    if (result == null) return;
+    await act(() async => pause = await api.setActive(result), '$result downloads at once');
   }
 
   /// Opens a page of the dashboard in an in-app browser panel (Chrome Custom Tab) over JellyView.
@@ -208,11 +322,15 @@ class _GetScreenState extends ConsumerState<GetScreen> {
         PopupMenuButton<String>(
           tooltip: 'More',
           icon: const Icon(Icons.more_horiz),
-          onSelected: (page) => openDashboardPage(page),
+          onSelected: (choice) => switch (choice) {
+            'manage' => GetLibraryScreen.open(context),
+            'active' => setActiveDownloads(),
+            _ => openDashboardPage('find'),
+          },
           itemBuilder: (context) => const [
-            PopupMenuItem(value: 'library', child: Text('Manage library (upgrade, subtitles, delete)')),
-            PopupMenuItem(value: 'downloading', child: Text('Downloading')),
-            PopupMenuItem(value: 'added', child: Text('Added recently')),
+            PopupMenuItem(value: 'manage', child: Text('Manage library (tracking, upgrades, subtitles, delete)')),
+            PopupMenuItem(value: 'active', child: Text('Downloads at once')),
+            PopupMenuItem(value: 'dashboard', child: Text('Open the full dashboard')),
           ],
         ),
         IconButton(tooltip: 'Media server address', onPressed: editUrl, icon: const Icon(IconsaxPlusLinear.setting_2)),
@@ -232,6 +350,7 @@ class _GetScreenState extends ConsumerState<GetScreen> {
             item: q,
             onPause: () => act(() => api.itemAction(q['hash'], 'pause'), 'Paused'),
             onResume: () => act(() => api.itemAction(q['hash'], 'resume'), 'Resumed'),
+            onMore: () => showQueueMenu(q),
             onCancel: () async {
               final ok = await showDialog<bool>(
                 context: context,
@@ -562,7 +681,13 @@ class _QueueRow extends StatelessWidget {
   final VoidCallback onPause;
   final VoidCallback onResume;
   final VoidCallback onCancel;
-  const _QueueRow({required this.item, required this.onPause, required this.onResume, required this.onCancel});
+  final VoidCallback onMore;
+  const _QueueRow(
+      {required this.item,
+      required this.onPause,
+      required this.onResume,
+      required this.onCancel,
+      required this.onMore});
 
   @override
   Widget build(BuildContext context) {
@@ -627,6 +752,7 @@ class _QueueRow extends StatelessWidget {
               icon: Icon(paused ? IconsaxPlusLinear.play : IconsaxPlusLinear.pause),
             ),
             IconButton(tooltip: 'Cancel', onPressed: onCancel, icon: const Icon(IconsaxPlusLinear.trash)),
+            IconButton(tooltip: 'More', onPressed: onMore, icon: const Icon(Icons.more_horiz)),
           ],
         ],
       ),

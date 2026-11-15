@@ -329,7 +329,16 @@ class PlaybackModelHelper {
       // and just point its video at the downloaded file. The separate offline player is only used when the
       // server can't be reached. Long-pressing Play still offers the choice.
       if (firstItemIsSynced && !showPlaybackOptions) {
-        final server = isOffline ? null : await getServerModel(PlaybackType.directStream);
+        // Server unreachable (Tailscale off, server down) but not yet flagged offline: don't hang or fail,
+        // fall back to the download after a few seconds.
+        PlaybackModel? server;
+        if (!isOffline) {
+          try {
+            server = await getServerModel(PlaybackType.directStream).timeout(const Duration(seconds: 8));
+          } catch (_) {
+            server = null;
+          }
+        }
         final file = syncedItem.videoFile;
         if (server is DirectPlaybackModel && await file.exists()) {
           return server.copyWith(media: () => Media(url: file.path));

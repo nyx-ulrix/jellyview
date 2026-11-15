@@ -69,7 +69,7 @@ enum HomeCarouselSettings {
   String label(BuildContext context) => switch (this) {
         HomeCarouselSettings.nextUp => context.localized.nextUp,
         HomeCarouselSettings.cont => context.localized.settingsContinue,
-        HomeCarouselSettings.combined => context.localized.combined,
+        HomeCarouselSettings.combined => 'Everything (watching, next up, liked)',
         HomeCarouselSettings.favourites => 'Liked',
       };
 }
