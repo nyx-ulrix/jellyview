@@ -323,7 +323,13 @@ class PlaybackModelHelper {
             startPosition: actualStartPosition,
           );
 
-      if (((showPlaybackOptions || firstItemIsSynced) && !isOffline) && context != null) {
+      // Downloaded: play the download straight away (falls back to streaming if the file is gone).
+      // Long-pressing Play still offers the choice.
+      if (firstItemIsSynced && !showPlaybackOptions) {
+        return await getOfflineModel() ?? await getServerModel(PlaybackType.directStream);
+      }
+
+      if (showPlaybackOptions && !isOffline && context != null) {
         final playbackType = await showPlaybackTypeSelection(
           context: context,
           options: options,

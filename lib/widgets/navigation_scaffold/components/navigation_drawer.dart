@@ -39,18 +39,7 @@ class NestedNavigationDrawer extends ConsumerWidget {
       backgroundColor: isExpanded ? Colors.transparent : null,
       surfaceTintColor: isExpanded ? Colors.transparent : null,
       children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(8, AdaptiveLayout.of(context).isDesktop || kIsWeb ? 0 : 16, 16, 0),
-          child: Row(
-            children: [
-              const Spacer(),
-              IconButton(
-                onPressed: () => toggleExpanded(false),
-                icon: const Icon(IconsaxPlusLinear.sidebar_left),
-              ),
-            ],
-          ),
-        ),
+        const SizedBox(height: 16),
         SideNavigationButtons(
           largeBar: true,
           destinations: destinations,

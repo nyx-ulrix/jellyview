@@ -15,6 +15,9 @@ class PosterRow extends ConsumerWidget {
   final List<ItemBaseModel> posters;
   final String label;
   final double? collectionAspectRatio;
+
+  /// Fixed row height; when set the poster-size setting (and pinch zoom) no longer changes these cards.
+  final double? height;
   final Function()? onLabelClick;
   final EdgeInsets contentPadding;
   final Function(ItemBaseModel focused)? onFocused;
@@ -27,6 +30,7 @@ class PosterRow extends ConsumerWidget {
     this.contentPadding = const EdgeInsets.symmetric(horizontal: 16),
     required this.label,
     this.collectionAspectRatio,
+    this.height,
     this.onLabelClick,
     this.onFocused,
     this.imagePriority,
@@ -56,6 +60,7 @@ class PosterRow extends ConsumerWidget {
       autoFocus: ref.read(argumentsStateProvider).htpcMode ? FocusProvider.autoFocusOf(context) : false,
       onLabelClick: onLabelClick,
       dominantRatio: dominantRatio,
+      height: height,
       items: posters,
       revealAlignment: revealAlignment,
       onFocused: (index) => onFocused?.call(posters[index]),

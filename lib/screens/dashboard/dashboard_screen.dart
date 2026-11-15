@@ -42,6 +42,10 @@ import 'package:fladder/widgets/shared/pinch_poster_zoom.dart';
 import 'package:fladder/widgets/shared/poster_size_slider.dart';
 import 'package:fladder/widgets/shared/pull_to_refresh.dart';
 
+/// Next Up / Continue Watching cards: 3:2 landscape, ~260pt wide image, plus room for the title lines.
+const double _wideCardRatio = 3 / 2;
+const double _wideCardRowHeight = 260 / _wideCardRatio + 66;
+
 @RoutePage()
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({
@@ -264,7 +268,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               contentPadding: padding,
                               label: context.localized.dashboardContinueWatching,
                               // Netflix-style wide thumbnails for anything you're partway through.
-                              collectionAspectRatio: 16 / 9,
+                              collectionAspectRatio: _wideCardRatio,
+                              height: _wideCardRowHeight, // fixed 3:2 (6:4), not user-resizable
                               imagePriority: const [ImageType.thumb, ImageType.backdrop, ImageType.primary],
                               posters: resumeVideo,
                             ),
@@ -291,7 +296,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               contentPadding: padding,
                               label: context.localized.nextUp,
                               // Netflix-style wide thumbnails for anything you're partway through.
-                              collectionAspectRatio: 16 / 9,
+                              collectionAspectRatio: _wideCardRatio,
+                              height: _wideCardRowHeight, // fixed 3:2 (6:4), not user-resizable
                               imagePriority: const [ImageType.thumb, ImageType.backdrop, ImageType.primary],
                               posters: dashboardData.nextUp,
                             ),
@@ -302,7 +308,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                               contentPadding: padding,
                               label: context.localized.dashboardContinue,
                               // Netflix-style wide thumbnails for anything you're partway through.
-                              collectionAspectRatio: 16 / 9,
+                              collectionAspectRatio: _wideCardRatio,
+                              height: _wideCardRowHeight, // fixed 3:2 (6:4), not user-resizable
                               imagePriority: const [ImageType.thumb, ImageType.backdrop, ImageType.primary],
                               posters: [...allResume, ...dashboardData.nextUp],
                             ),

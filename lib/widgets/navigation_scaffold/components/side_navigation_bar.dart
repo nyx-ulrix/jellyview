@@ -83,6 +83,10 @@ class SideNavigationRail extends ConsumerWidget {
         !topBarNoBlurRoutes.contains(context.router.current.name);
 
     final blurWidth = (shouldExpand ? expandedWidth : collapsedWidth) + 25;
+    final touchMenu = AdaptiveLayout.inputDeviceOf(context) == InputDevice.touch;
+    // Opening and closing ease in and out.
+    const menuDuration = Duration(milliseconds: 320);
+    const menuCurve = Curves.easeInOutCubic;
 
     final surfaceColor = Theme.of(context).colorScheme.surface;
 
@@ -91,10 +95,28 @@ class SideNavigationRail extends ConsumerWidget {
         AdaptiveLayout(
           data: AdaptiveLayout.of(context).copyWith(
             // -0.1 offset to fix single visible pixel line
-            sideBarWidth: (fullyExpanded ? expandedWidth : collapsedWidth) - 0.1,
+            // On touch the open menu slides over the page instead of pushing it aside.
+            sideBarWidth: (fullyExpanded && !touchMenu ? expandedWidth : collapsedWidth) - 0.1,
           ),
           child: child,
         ),
+        // Closed menu on a touch screen (main pages only, never the player): a thin strip beside it, swipe it open.
+        if (largeBar && !expandedSideBar && touchMenu && hasOverlay && !fullScreenChildRoute)
+          PositionedDirectional(
+            start: collapsedWidth,
+            top: 0,
+            bottom: 0,
+            width: 28,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onHorizontalDragEnd: (details) {
+                final v = (details.primaryVelocity ?? 0) * (isRtl ? -1 : 1);
+                if (v > 200) {
+                  ref.read(clientSettingsProvider.notifier).update((state) => state.copyWith(expandSideBar: true));
+                }
+              },
+            ),
+          ),
         // Expanded menu on a touch screen: touching anywhere outside it closes it (the touch still goes through).
         if (largeBar && expandedSideBar && AdaptiveLayout.inputDeviceOf(context) == InputDevice.touch)
           Positioned.fill(
@@ -112,7 +134,9 @@ class SideNavigationRail extends ConsumerWidget {
                 duration: const Duration(milliseconds: 250),
                 opacity: !fullScreenChildRoute ? 1 : 0,
                 child: IgnorePointer(
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: menuDuration,
+                    curve: menuCurve,
                     width: blurWidth,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -162,83 +186,108 @@ class SideNavigationRail extends ConsumerWidget {
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 250),
                   opacity: !fullScreenChildRoute ? 1 : 0,
-                  child: SizedBox(
-                    width: shouldExpand ? expandedWidth : collapsedWidth,
-                    child: Padding(
-                      key: const Key('navigation_rail'),
-                      padding: railPadding,
-                      child: _scrollIf(
-                          shortRail,
-                          Column(
-                            spacing: 2,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 14),
-                                child: CollapseButton(
-                                  label: null,
-                                  // Always visible: on touch there's no hover to reveal it.
-                                  keepVisible: true,
-                                  icon: Icon(
-                                    largeBar && expandedSideBar ? IconsaxPlusLinear.sidebar_left : Icons.more_horiz,
-                                    color: Theme.of(context).colorScheme.onSurface.withValues(
-                                          alpha: largeBar && expandedSideBar ? 0.65 : 1,
-                                        ),
+                  child: GestureDetector(
+                    // Swipe the menu open (away from the edge) or closed (towards it).
+                    onHorizontalDragEnd: largeBar
+                        ? (details) {
+                            final v = (details.primaryVelocity ?? 0) * (isRtl ? -1 : 1);
+                            if (expandedSideBar ? v < -200 : v > 200) {
+                              ref
+                                  .read(clientSettingsProvider.notifier)
+                                  .update((state) => state.copyWith(expandSideBar: !expandedSideBar));
+                            }
+                          }
+                        : null,
+                    child: AnimatedContainer(
+                      duration: menuDuration,
+                      curve: menuCurve,
+                      clipBehavior: Clip.hardEdge,
+                      decoration: const BoxDecoration(),
+                      width: shouldExpand ? expandedWidth : collapsedWidth,
+                      child: Padding(
+                        key: const Key('navigation_rail'),
+                        padding: railPadding,
+                        child: _scrollIf(
+                            shortRail,
+                            Column(
+                              spacing: 2,
+                              children: [
+                                Visibility(
+                                  // Open menu: no close button, touching outside closes it.
+                                  visible: !(largeBar && expandedSideBar),
+                                  maintainSize: true,
+                                  maintainAnimation: true,
+                                  maintainState: true,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                                    child: CollapseButton(
+                                      label: null,
+                                      // Always visible: on touch there's no hover to reveal it.
+                                      keepVisible: true,
+                                      icon: Icon(
+                                        largeBar && expandedSideBar ? IconsaxPlusLinear.sidebar_left : Icons.more_horiz,
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(
+                                              alpha: largeBar && expandedSideBar ? 0.65 : 1,
+                                            ),
+                                      ),
+                                      onPressed: !largeBar
+                                          ? () => scaffoldKey.currentState?.openDrawer()
+                                          : () => ref
+                                              .read(clientSettingsProvider.notifier)
+                                              .update((state) => state.copyWith(expandSideBar: !state.expandSideBar)),
+                                    ),
                                   ),
-                                  onPressed: !largeBar
-                                      ? () => scaffoldKey.currentState?.openDrawer()
-                                      : () => ref
-                                          .read(clientSettingsProvider.notifier)
-                                          .update((state) => state.copyWith(expandSideBar: !state.expandSideBar)),
                                 ),
-                              ),
-                              if (largeBar) ...[
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4)
-                                      .copyWith(bottom: expandedSideBar ? 10 : 0),
-                                  child: AnimatedFadeSize(
-                                    duration: const Duration(milliseconds: 250),
-                                    child: shouldExpand ? actionButton(context).extended : actionButton(context).normal,
+                                if (largeBar) ...[
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4)
+                                        .copyWith(bottom: expandedSideBar ? 10 : 0),
+                                    child: AnimatedFadeSize(
+                                      duration: const Duration(milliseconds: 250),
+                                      child:
+                                          shouldExpand ? actionButton(context).extended : actionButton(context).normal,
+                                    ),
                                   ),
-                                ),
-                              ],
-                              // Short windows (a phone on its side): plain buttons in a scrolling rail.
-                              if (shortRail)
-                                SideNavigationButtons(
-                                  largeBar: false,
-                                  destinations: destinations,
-                                  tooltipPosition: tooltipPosition,
-                                  currentIndex: currentIndex,
-                                  shouldExpand: shouldExpand,
-                                )
-                              else
-                                Expanded(
-                                  child: SideNavigationButtons(
-                                    largeBar: largeBar,
+                                ],
+                                // Short windows (a phone on its side): plain buttons in a scrolling rail.
+                                if (shortRail)
+                                  SideNavigationButtons(
+                                    largeBar: false,
                                     destinations: destinations,
                                     tooltipPosition: tooltipPosition,
                                     currentIndex: currentIndex,
                                     shouldExpand: shouldExpand,
+                                  )
+                                else
+                                  Expanded(
+                                    child: SideNavigationButtons(
+                                      largeBar: largeBar,
+                                      destinations: destinations,
+                                      tooltipPosition: tooltipPosition,
+                                      currentIndex: currentIndex,
+                                      shouldExpand: shouldExpand,
+                                    ),
                                   ),
+                                NavigationButton(
+                                  label: context.localized.settings,
+                                  selected: currentLocation.contains(const SettingsRoute().routeName),
+                                  selectedIcon: const Icon(IconsaxPlusBold.setting_3),
+                                  horizontal: true,
+                                  expanded: shouldExpand,
+                                  icon: const SizedBox.shrink(),
+                                  customIcon: const ExcludeFocusTraversal(
+                                      child: SizedBox.square(dimension: 40, child: SettingsUserIcon())),
+                                  onPressed: () {
+                                    if (AdaptiveLayout.layoutModeOf(context) == LayoutMode.single) {
+                                      context.router.push(const SettingsRoute());
+                                    } else {
+                                      context.router.push(const ClientSettingsRoute());
+                                    }
+                                  },
                                 ),
-                              NavigationButton(
-                                label: context.localized.settings,
-                                selected: currentLocation.contains(const SettingsRoute().routeName),
-                                selectedIcon: const Icon(IconsaxPlusBold.setting_3),
-                                horizontal: true,
-                                expanded: shouldExpand,
-                                icon: const SizedBox.shrink(),
-                                customIcon: const ExcludeFocusTraversal(
-                                    child: SizedBox.square(dimension: 40, child: SettingsUserIcon())),
-                                onPressed: () {
-                                  if (AdaptiveLayout.layoutModeOf(context) == LayoutMode.single) {
-                                    context.router.push(const SettingsRoute());
-                                  } else {
-                                    context.router.push(const ClientSettingsRoute());
-                                  }
-                                },
-                              ),
-                            ],
-                          )),
+                              ],
+                            )),
+                      ),
                     ),
                   ),
                 ),
