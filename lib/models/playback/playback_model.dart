@@ -231,7 +231,9 @@ class PlaybackModelHelper {
     final itemQueue = syncedItems.map((e) => e.itemModel).nonNulls;
 
     return OfflinePlaybackModel(
-      item: syncedItemModel,
+      // The full item the app just loaded has the show name, logo and artwork; the download's saved copy
+      // can lack them (that hid the title in the player). Use the saved copy only when offline.
+      item: item.name.isNotEmpty ? item : syncedItemModel,
       syncedItem: syncedItem,
       trickPlay: syncedItem.trickPlayModel,
       mediaSegments: syncedItem.mediaSegments,
@@ -323,10 +325,16 @@ class PlaybackModelHelper {
             startPosition: actualStartPosition,
           );
 
-      // Downloaded: play the download straight away (falls back to streaming if the file is gone).
-      // Long-pressing Play still offers the choice.
+      // Downloaded: one player for everything. Load the normal player (title, subtitles, progress sync)
+      // and just point its video at the downloaded file. The separate offline player is only used when the
+      // server can't be reached. Long-pressing Play still offers the choice.
       if (firstItemIsSynced && !showPlaybackOptions) {
-        return await getOfflineModel() ?? await getServerModel(PlaybackType.directStream);
+        final server = isOffline ? null : await getServerModel(PlaybackType.directStream);
+        final file = syncedItem.videoFile;
+        if (server is DirectPlaybackModel && await file.exists()) {
+          return server.copyWith(media: () => Media(url: file.path));
+        }
+        return server ?? await getOfflineModel();
       }
 
       if (showPlaybackOptions && !isOffline && context != null) {
