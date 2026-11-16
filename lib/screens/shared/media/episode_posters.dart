@@ -11,6 +11,7 @@ import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/sync_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/providers/sync/sync_provider_helpers.dart';
+import 'package:fladder/screens/shared/media/episode_download_button.dart';
 import 'package:fladder/screens/syncing/sync_button.dart';
 import 'package:fladder/theme.dart';
 import 'package:fladder/util/adaptive_layout/adaptive_layout.dart';
@@ -150,6 +151,24 @@ class _EpisodePosterState extends ConsumerState<EpisodePosters> with EpisodePick
               ],
             ),
           ),
+        if (widget.vertical && !isDPad && (ref.watch(userProvider.select((u) => u?.canDownload)) ?? false))
+          Builder(builder: (context) {
+            final unwatched =
+                episodes.where((e) => !e.userData.played && e.playAble && e.syncAble).map((e) => e.id).toSet();
+            if (unwatched.isEmpty) return const SizedBox.shrink();
+            return Padding(
+              padding: widget.contentPadding,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  icon: const Icon(IconsaxPlusLinear.import_3, size: 18),
+                  label: Text('Download unwatched (${unwatched.length})'),
+                  onPressed: () => queueEpisodeDownloads(ref, episodes.first.parentBaseModel, unwatched,
+                      messenger: ScaffoldMessenger.maybeOf(context)),
+                ),
+              ),
+            );
+          }),
         if (widget.vertical && !isDPad)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +325,6 @@ class _EpisodeRow extends ConsumerWidget {
     final theme = Theme.of(context);
     final muted = theme.colorScheme.onSurfaceVariant;
     final runTime = episode.overview.runTime;
-    final synced = ref.watch(syncedItemProvider(episode)).value;
     // Phones: synopsis full width under the thumbnail row (Netflix mobile); wider screens: beside it.
     final wide = MediaQuery.sizeOf(context).width >= 600;
     final Widget synopsis = episode.overview.summary.isEmpty
@@ -317,12 +335,6 @@ class _EpisodeRow extends ConsumerWidget {
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodySmall?.copyWith(color: muted, height: 1.35),
           );
-    // A show download registers every episode, so "has an entry" isn't "downloaded": check the file and task.
-    final downloading = ref.watch(downloadTasksProvider(episode.id)).task != null;
-    final canDownload = episode.syncAble &&
-        (ref.watch(userProvider.select((u) => u?.canDownload)) ?? false) &&
-        (synced == null || !synced.hasVideoFile) &&
-        !downloading;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       color: selected ? theme.colorScheme.primary.withValues(alpha: 0.22) : Colors.transparent,
@@ -373,25 +385,7 @@ class _EpisodeRow extends ConsumerWidget {
                       ),
                     ),
                     // Downloaded / downloading episodes show their status on the thumbnail instead.
-                    if (canDownload)
-                      IconButton(
-                        tooltip: 'Download',
-                        icon: const Icon(IconsaxPlusLinear.import_3),
-                        onPressed: () async {
-                          final messenger = ScaffoldMessenger.maybeOf(context);
-                          try {
-                            final started = await ref
-                                .read(syncProvider.notifier)
-                                .syncSeries(episode.parentBaseModel, episodeIds: {episode.id});
-                            messenger?.showSnackBar(SnackBar(
-                                content: Text(started != null
-                                    ? 'Downloading ${episode.name}'
-                                    : "Couldn't start the download. Check Settings > Downloads.")));
-                          } catch (e) {
-                            messenger?.showSnackBar(SnackBar(content: Text('Download failed: $e')));
-                          }
-                        },
-                      ),
+                    EpisodeDownloadButton(episode: episode),
                   ],
                 ),
                 if (!wide) synopsis,

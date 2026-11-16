@@ -113,6 +113,11 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  /// Clears "syncing" left behind by a download that was interrupted (app closed, request failed);
+  /// otherwise those items show "Syncing item details" forever.
+  Future<int> clearStuckSyncing() => (update(databaseItems)..where((tbl) => tbl.syncing.equals(true)))
+      .write(const DatabaseItemsCompanion(syncing: Value(false)));
+
   Future<void> insertMultipleEntries(List<SyncedItem> items) async {
     await batch((batch) {
       batch.insertAll(

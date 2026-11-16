@@ -118,6 +118,7 @@ class SyncNotifier extends StateNotifier<SyncSettingsModel> {
 
   void _init() {
     cleanupTemporaryFiles();
+    _db.clearStuckSyncing();
     ref.listen(
       userProvider,
       (previous, next) {
@@ -1334,57 +1335,77 @@ extension SyncNotifierHelpers on SyncNotifier {
       ],
     );
 
-    final seasons = seasonsResponse.body?.items ?? [];
+    // Downloading one episode (or a few) only prepares those episodes and their seasons; preparing every
+    // episode of a long show first (details + artwork for each) made the download button hang for ages.
+    final wholeShow = episode == null && season == null && (episodeIds == null || episodeIds.isEmpty);
+    final wanted = {if (episode != null) episode.id, ...?episodeIds};
+    final seasons = (seasonsResponse.body?.items ?? [])
+        .where((s) =>
+            wholeShow ||
+            s.id == season?.id ||
+            (episode != null && s.indexNumber == episode.season) ||
+            episodeIds != null)
+        .toList();
 
-    for (var i = 0; i < seasons.length; i++) {
-      final newSeason = seasons[i];
-      final syncedSeason = await createSyncItem(newSeason, parent: seriesItem);
-      newItems.add(syncedSeason);
-      final episodesResponse = await api.showsSeriesIdEpisodesGet(
-        isMissing: false,
-        enableUserData: true,
-        fields: [
-          ItemFields.mediastreams,
-          ItemFields.mediasources,
-          ItemFields.overview,
-          ItemFields.mediasourcecount,
-          ItemFields.airtime,
-          ItemFields.datecreated,
-          ItemFields.datelastmediaadded,
-          ItemFields.datelastrefreshed,
-          ItemFields.sortname,
-          ItemFields.seasonuserdata,
-          ItemFields.externalurls,
-          ItemFields.genres,
-          ItemFields.parentid,
-          ItemFields.path,
-          ItemFields.chapters,
-          ItemFields.trickplay,
-        ],
-        seasonId: newSeason.id,
-        seriesId: seriesItem.id,
-      );
+    try {
+      for (var i = 0; i < seasons.length; i++) {
+        final newSeason = seasons[i];
+        final syncedSeason = await createSyncItem(newSeason, parent: seriesItem);
+        newItems.add(syncedSeason);
+        final episodesResponse = await api.showsSeriesIdEpisodesGet(
+          isMissing: false,
+          enableUserData: true,
+          fields: [
+            ItemFields.mediastreams,
+            ItemFields.mediasources,
+            ItemFields.overview,
+            ItemFields.mediasourcecount,
+            ItemFields.airtime,
+            ItemFields.datecreated,
+            ItemFields.datelastmediaadded,
+            ItemFields.datelastrefreshed,
+            ItemFields.sortname,
+            ItemFields.seasonuserdata,
+            ItemFields.externalurls,
+            ItemFields.genres,
+            ItemFields.parentid,
+            ItemFields.path,
+            ItemFields.chapters,
+            ItemFields.trickplay,
+          ],
+          seasonId: newSeason.id,
+          seriesId: seriesItem.id,
+        );
 
-      final episodes = episodesResponse.body?.items?.where((ep) => ep.seasonId == newSeason.id).toList() ?? [];
+        final episodes = episodesResponse.body?.items
+                ?.where((ep) =>
+                    ep.seasonId == newSeason.id && (wholeShow || newSeason.id == season?.id || wanted.contains(ep.id)))
+                .toList() ??
+            [];
+        if (episodes.isEmpty && !wholeShow && newSeason.id != season?.id) continue;
 
-      final episodeResults = await Future.wait(
-        episodes.map((ep) async {
-          final newEpisode = await createSyncItem(ep, parent: syncedSeason);
-          return (ep, newEpisode);
-        }),
-      );
+        final episodeResults = await Future.wait(
+          episodes.map((ep) async {
+            final newEpisode = await createSyncItem(ep, parent: syncedSeason);
+            return (ep, newEpisode);
+          }),
+        );
 
-      for (final (ep, newEpisode) in episodeResults) {
-        newItems.add(newEpisode);
-        if (episode?.id == ep.id ||
-            (newSeason.id == season?.id || episodeIds?.contains(ep.id) == true) &&
-                !await newEpisode.videoFile.exists()) {
-          itemsToDownload.add(newEpisode);
+        for (final (ep, newEpisode) in episodeResults) {
+          newItems.add(newEpisode);
+          if (episode?.id == ep.id ||
+              (newSeason.id == season?.id || episodeIds?.contains(ep.id) == true) &&
+                  !await newEpisode.videoFile.exists()) {
+            itemsToDownload.add(newEpisode);
+          }
         }
       }
+    } finally {
+      // Whatever happened above, never leave the show marked "syncing".
+      await _db.insertMultipleEntries([
+        for (final entry in newItems) entry.copyWith(syncing: false),
+      ]);
     }
-
-    await _db.insertMultipleEntries(newItems);
 
     for (var i = 0; i < itemsToDownload.length; i++) {
       final item = itemsToDownload[i];
