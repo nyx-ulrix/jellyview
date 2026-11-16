@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -85,7 +86,14 @@ class BackgroundDownloader extends _$BackgroundDownloader {
     );
   }
 
-  (String, dynamic) globalConfig(int value) => value == 0
+  /// Phones and tablets: no holding queue. That queue lives inside the app, so downloads waiting their turn
+  /// only started while the app was open; without it every download is handed to Android at once and its
+  /// scheduler runs them a few at a time in the background, app open or not.
+  dynamic globalConfig(int value) => !kIsWeb && (Platform.isAndroid || Platform.isIOS)
+      ? (Config.holdingQueue, (null, null, null))
+      : _desktopQueue(value);
+
+  (String, dynamic) _desktopQueue(int value) => value == 0
       ? (
           Config.holdingQueue,
           (

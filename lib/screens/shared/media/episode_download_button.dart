@@ -70,22 +70,19 @@ class EpisodeDownloadButton extends ConsumerWidget {
 
     // The file must really be on the device: older builds recorded every episode of a show without downloading it.
     if (synced != null && synced.hasVideoFile && synced.videoFile.existsSync()) {
-      return Tooltip(
-        message: 'Downloaded',
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Icon(IconsaxPlusBold.tick_circle, color: scheme.primary),
-        ),
+      return IconButton(
+        tooltip: 'Downloaded',
+        onPressed: () {}, // catches the tap so the row doesn't open the episode
+        icon: Icon(IconsaxPlusBold.tick_circle, color: scheme.primary),
       );
     }
     if (stream.task != null) {
       // Downloading: the ring is drawn round the button as the file arrives (spins while still queued).
-      return Tooltip(
-          message: 'Downloading',
-          child: Padding(padding: const EdgeInsets.all(4), child: ring(value: stream.progress)));
+      return IconButton(
+          tooltip: 'Downloading', padding: EdgeInsets.zero, onPressed: () {}, icon: ring(value: stream.progress));
     }
     if (pending) {
-      return Tooltip(message: 'Getting ready', child: Padding(padding: const EdgeInsets.all(4), child: ring()));
+      return IconButton(tooltip: 'Getting ready', padding: EdgeInsets.zero, onPressed: () {}, icon: ring());
     }
     return IconButton(
       tooltip: 'Download',

@@ -44,10 +44,21 @@ class _VideoPlayerState extends ConsumerState<VideoPlayer> with WidgetsBindingOb
     }
   }
 
+  /// Upright or sideways when the player opened, so leaving it can put the screen back that way.
+  final bool _openedUpright = () {
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    return view.physicalSize.height >= view.physicalSize.width;
+  }();
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+    SystemChrome.setPreferredOrientations(_openedUpright
+        ? const [DeviceOrientation.portraitUp]
+        : const [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+    // Then free rotation again, once the screen has turned back.
+    Future.delayed(
+        const Duration(milliseconds: 1500), () => SystemChrome.setPreferredOrientations(DeviceOrientation.values));
     super.dispose();
   }
 

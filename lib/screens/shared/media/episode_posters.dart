@@ -357,6 +357,7 @@ class _EpisodeRow extends ConsumerWidget {
                     SizedBox(
                       width: (MediaQuery.sizeOf(context).width * 0.4).clamp(120.0, 260.0),
                       child: EpisodePoster(
+                        showSyncStatus: false,
                         episode: episode,
                         showLabel: false,
                         onTap: onTap,
@@ -409,6 +410,9 @@ class EpisodePoster extends ConsumerWidget {
   final bool isCurrentEpisode;
   final Object? heroTag;
 
+  /// The small download-status badge on the thumbnail (off in the episode list, which has its own button).
+  final bool showSyncStatus;
+
   const EpisodePoster({
     super.key,
     required this.episode,
@@ -420,6 +424,7 @@ class EpisodePoster extends ConsumerWidget {
     this.onFocusChanged,
     this.isCurrentEpisode = false,
     this.heroTag,
+    this.showSyncStatus = true,
   });
 
   @override
@@ -494,7 +499,7 @@ class EpisodePoster extends ConsumerWidget {
                       switch (syncedDetails) {
                         AsyncValue<SyncedItem?>(:final value) => Builder(
                             builder: (context) {
-                              if (value == null) {
+                              if (value == null || !showSyncStatus) {
                                 return const SizedBox.shrink();
                               }
                               return StatusCard(
