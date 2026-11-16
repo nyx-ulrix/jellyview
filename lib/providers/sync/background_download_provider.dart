@@ -77,12 +77,15 @@ class BackgroundDownloader extends _$BackgroundDownloader {
 
   void updateTranslations(BuildContext context) async {
     if (kIsWeb) return;
+    // One notification for all downloads, updated in place (no new one per episode or per finish):
+    // "Downloading 3 of 22" with an overall progress bar, then a single "finished" when the batch is done.
     state.configureNotification(
-      running: TaskNotification(context.localized.notificationDownloadingDownloading, '{filename}\n{networkSpeed}'),
-      complete: TaskNotification(context.localized.notificationDownloadingFinished, '{filename}'),
-      paused: TaskNotification(context.localized.notificationDownloadingPaused, '{filename}'),
-      error: TaskNotification(context.localized.notificationDownloadingError, '{filename}'),
+      running:
+          TaskNotification(context.localized.notificationDownloadingDownloading, '{numFinished} of {numTotal} done'),
+      complete: TaskNotification(context.localized.notificationDownloadingFinished, '{numTotal} downloaded'),
+      error: TaskNotification(context.localized.notificationDownloadingError, '{numFailed} could not be downloaded'),
       progressBar: true,
+      groupNotificationId: 'jellyview-downloads',
     );
   }
 
